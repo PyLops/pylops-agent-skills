@@ -1,0 +1,13 @@
+{
+  "name": "pylops",
+  "version": "0.1.0",
+  "description": "Skills for building and checking PyLops linear operators in your own code",
+  "author": {
+    "name": "PyLops",
+    "url": "https://github.com/PyLops"
+  },
+  "homepage": "https://pylops.readthedocs.io",
+  "repository": "https://github.com/PyLops/pylops-agent-skills",
+  "license": "LGPL-2.1",
+  "keywords": ["pylops", "inverse-problems", "linear-operators", "scientific-computing"]
+}

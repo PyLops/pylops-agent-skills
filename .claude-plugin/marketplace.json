@@ -1,0 +1,17 @@
+{
+  "name": "pylops-agent-skills",
+  "owner": {
+    "name": "PyLops",
+    "url": "https://github.com/PyLops"
+  },
+  "metadata": {
+    "description": "Agent skills for projects that use PyLops libraries"
+  },
+  "plugins": [
+    {
+      "name": "pylops",
+      "source": "./plugins/pylops",
+      "description": "Skills for the PyLops main library"
+    }
+  ]
+}
