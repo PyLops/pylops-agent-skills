@@ -1,0 +1,13 @@
+{
+  "name": "pyproximal",
+  "version": "0.1.0",
+  "description": "Skills for solving non-smooth and constrained inverse problems with PyProximal and PyLops operators",
+  "author": {
+    "name": "PyLops",
+    "url": "https://github.com/PyLops"
+  },
+  "homepage": "https://pyproximal.readthedocs.io",
+  "repository": "https://github.com/PyLops/pylops-agent-skills",
+  "license": "LGPL-2.1",
+  "keywords": ["pylops", "pyproximal", "proximal-algorithms", "convex-optimization", "inverse-problems"]
+}

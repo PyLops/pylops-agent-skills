@@ -1,0 +1,13 @@
+{
+  "name": "pylops-mpi",
+  "version": "0.1.0",
+  "description": "Skills for distributing PyLops operators and inversions over MPI with PyLops-MPI",
+  "author": {
+    "name": "PyLops",
+    "url": "https://github.com/PyLops"
+  },
+  "homepage": "https://pylops.github.io/pylops-mpi",
+  "repository": "https://github.com/PyLops/pylops-agent-skills",
+  "license": "LGPL-2.1",
+  "keywords": ["pylops", "pylops-mpi", "mpi", "distributed-computing", "inverse-problems"]
+}

@@ -12,6 +12,16 @@
       "name": "pylops",
       "source": "./plugins/pylops",
       "description": "Skills for the PyLops main library"
+    },
+    {
+      "name": "pyproximal",
+      "source": "./plugins/pyproximal",
+      "description": "Skills for non-smooth and constrained inverse problems with PyProximal"
+    },
+    {
+      "name": "pylops-mpi",
+      "source": "./plugins/pylops-mpi",
+      "description": "Skills for distributing PyLops workflows with PyLops-MPI"
     }
   ]
 }
