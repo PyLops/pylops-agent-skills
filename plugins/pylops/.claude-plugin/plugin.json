@@ -1,7 +1,7 @@
 {
   "name": "pylops",
   "version": "0.1.0",
-  "description": "Skills for building and checking PyLops linear operators in your own code",
+  "description": "Skills for building PyLops operators and solving, tuning, debugging and accelerating inverse problems with them",
   "author": {
     "name": "PyLops",
     "url": "https://github.com/PyLops"
