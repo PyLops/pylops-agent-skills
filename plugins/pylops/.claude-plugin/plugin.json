@@ -1,6 +1,6 @@
 {
   "name": "pylops",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Skills for building PyLops operators and solving, tuning, debugging and accelerating inverse problems with them",
   "author": {
     "name": "PyLops",
