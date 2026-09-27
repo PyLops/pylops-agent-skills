@@ -187,26 +187,26 @@ Both models were run with 3 runs per arm and Sonnet as the judge.
 | ---- | --------- | ------------ | ------ | ---------- | ------------- | ------- |
 | `dbg-01-custom-adjoint-conv` | 1.00 | 1.00 | 0.00 | 0.73 | 0.47 | +0.27 |
 | `dbg-02-vstack-missing-conj` | 1.00 | 1.00 | 0.00 | 0.67 | 0.73 | −0.07 |
-| `dbg-03-complex-dtype-funcop` | 0.87 | 1.00 | −0.13 | 0.87 | 0.87 | 0.00 |
-| `dbg-04-scaling-stacked-blocks` | 1.00 | 0.83 | +0.17 | 0.83 | 0.17 | **+0.67** |
-| `dbg-05-fista-eps-prose` | 1.00 | 0.50 | +0.50 | 0.67 | 0.17 | **+0.50** |
-| `dbg-06-physics-limited` | 1.00 | 0.83 | +0.17 | 0.50 | 0.50 | 0.00 |
+| `dbg-03-complex-dtype-funcop` | 0.73 | 1.00 | −0.27 | 0.87 | 0.87 | 0.00 |
+| `dbg-04-scaling-stacked-blocks` | 0.83 | 1.00 | −0.17 | 0.83 | 0.17 | **+0.67** |
+| `dbg-05-fista-eps-prose` | 1.00 | 1.00 | 0.00 | 0.67 | 0.17 | **+0.50** |
+| `dbg-06-physics-limited` | 1.00 | 1.00 | 0.00 | 0.50 | 0.50 | 0.00 |
 | `dbg-07-two-bugs` | 1.00 | 1.00 | 0.00 | 0.73 | 0.47 | +0.27 |
 | `dbg-08-neg-which-solver` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| `dbg-09-neg-scipy-minimize` | 1.00 | 1.00 | 0.00 | 0.78 | 1.00 | −0.22 |
-| **Mean (all cases)** | | | **+0.08** | | | **+0.16** |
-| **Mean (fire cases `dbg-01`–`dbg-07`)** | | | **+0.10** | | | **+0.23** |
+| `dbg-09-neg-scipy-minimize` | 0.89 | 1.00 | −0.11 | 0.78 | 1.00 | −0.22 |
+| **Mean (all cases)** | | | **−0.06** | | | **+0.16** |
+| **Mean (fire cases `dbg-01`–`dbg-07`)** | | | **−0.06** | | | **+0.23** |
 
 | Fire runs | Opus with | Opus without | Haiku with | Haiku without |
 | --------- | --------- | ------------ | ---------- | ------------- |
-| correct diagnosis (`diagnosis`) | 21/21 | 20/21 | 16/21 | 7/21 |
-| no fabricated values (`no-fabrication`) | 20/21 | 17/21 | 13/21 | 12/21 |
-| skill called (`trigger`) | 21/21 | – | 21/21 | – |
+| correct diagnosis (`diagnosis`) | 20/21 | 21/21 | 16/21 | 7/21 |
+| no fabricated values (`no-fabrication`) | 19/21 | 21/21 | 13/21 | 12/21 |
+| skill called (`trigger`) | 19/21 | – | 21/21 | – |
 
 Reports:
 
 - Opus (`--model opus`, agent `claude-opus-5-5`):
-  [report](results/2026-09-27T22-21-45-489Z/report.html).
+  [report](results/2026-09-27T22-35-20-518Z/report.html).
 - Haiku (`--model haiku`):
   [report](results/2026-09-27T21-51-09-121Z/report.html).
 
@@ -217,44 +217,47 @@ turns, from the same runs. The judge (Sonnet) adds about $0.10–0.35 per fire r
 
 | Case | Opus with | Opus without | Haiku with | Haiku without |
 | ---- | --------- | ------------ | ---------- | ------------- |
-| `dbg-01-custom-adjoint-conv` | $0.45 · 31 s · 4.0 | $0.20 · 23 s · 2.0 | $0.32 · 97 s · 13.3 | $0.21 · 76 s · 6.7 |
-| `dbg-02-vstack-missing-conj` | $0.34 · 34 s · 4.3 | $0.23 · 25 s · 2.0 | $0.28 · 109 s · 8.7 | $0.27 · 88 s · 2.7 |
-| `dbg-03-complex-dtype-funcop` | $0.51 · 60 s · 6.7 | $0.25 · 30 s · 3.7 | $0.39 · 70 s · 10.0 | $0.27 · 47 s · 10.3 |
-| `dbg-04-scaling-stacked-blocks` | $0.44 · 46 s · 5.3 | $0.23 · 32 s · 2.0 | $0.32 · 96 s · 7.0 | $0.21 · 37 s · 1.3 |
-| `dbg-05-fista-eps-prose` | $0.32 · 40 s · 4.3 | $0.23 · 35 s · 1.0 | $0.36 · 96 s · 10.0 | $0.12 · 21 s · 1.0 |
-| `dbg-06-physics-limited` | $0.41 · 47 s · 5.3 | $0.35 · 43 s · 3.7 | $0.50 · 159 s · 11.3 | $0.23 · 65 s · 4.7 |
-| `dbg-07-two-bugs` | $0.39 · 39 s · 4.3 | $0.26 · 28 s · 2.0 | $0.32 · 122 s · 12.0 | $0.11 · 27 s · 1.7 |
-| `dbg-08-neg-which-solver` | $0.19 · 28 s · 4.3 | $0.12 · 23 s · 1.0 | $0.09 · 24 s · 4.7 | $0.05 · 15 s · 1.0 |
-| `dbg-09-neg-scipy-minimize` | $0.13 · 18 s · 1.0 | $0.11 · 17 s · 1.0 | $0.04 · 16 s · 1.0 | $0.04 · 15 s · 1.0 |
-| **Fire cases, sum per run** | **$2.86** | **$1.75** | **$2.49** | **$1.41** |
-| **Whole suite, 3 runs per arm** | **$9.53** | **$5.95** | **$7.88** | **$4.48** |
+| `dbg-01-custom-adjoint-conv` | $0.29 · 27 s · 2.7 | $0.24 · 23 s · 2.0 | $0.32 · 97 s · 13.3 | $0.21 · 76 s · 6.7 |
+| `dbg-02-vstack-missing-conj` | $0.30 · 32 s · 4.0 | $0.23 · 26 s · 2.0 | $0.28 · 109 s · 8.7 | $0.27 · 88 s · 2.7 |
+| `dbg-03-complex-dtype-funcop` | $0.61 · 72 s · 6.7 | $0.31 · 29 s · 3.0 | $0.39 · 70 s · 10.0 | $0.27 · 47 s · 10.3 |
+| `dbg-04-scaling-stacked-blocks` | $0.48 · 50 s · 6.0 | $0.22 · 30 s · 2.0 | $0.32 · 96 s · 7.0 | $0.21 · 37 s · 1.3 |
+| `dbg-05-fista-eps-prose` | $0.36 · 40 s · 4.3 | $0.23 · 31 s · 1.0 | $0.36 · 96 s · 10.0 | $0.12 · 21 s · 1.0 |
+| `dbg-06-physics-limited` | $0.33 · 39 s · 4.3 | $0.36 · 42 s · 3.0 | $0.50 · 159 s · 11.3 | $0.23 · 65 s · 4.7 |
+| `dbg-07-two-bugs` | $0.38 · 37 s · 4.0 | $0.22 · 27 s · 2.0 | $0.32 · 122 s · 12.0 | $0.11 · 27 s · 1.7 |
+| `dbg-08-neg-which-solver` | $0.18 · 23 s · 4.0 | $0.11 · 21 s · 1.0 | $0.09 · 24 s · 4.7 | $0.05 · 15 s · 1.0 |
+| `dbg-09-neg-scipy-minimize` | $0.13 · 17 s · 1.0 | $0.11 · 18 s · 1.0 | $0.04 · 16 s · 1.0 | $0.04 · 15 s · 1.0 |
+| **Fire cases, sum per run** | **$2.76** | **$1.81** | **$2.49** | **$1.41** |
+| **Whole suite, 3 runs per arm** | **$9.19** | **$6.11** | **$7.88** | **$4.48** |
 
-- With the plugin a fire run costs about 65% more for Opus and 75% more for
+- With the plugin a fire run costs about 50% more for Opus and 75% more for
   Haiku, mostly from loading the skill and the extra turns it asks for
   (reproducing the problem, dot-tests, testing the fix).
-- For Opus the extra cost buys mostly better-supported numbers (see Findings);
-  for Haiku it buys the right diagnosis.
+- For Opus the extra cost buys longer, more systematic reports but no better
+  diagnosis (see Findings); for Haiku it buys the right diagnosis.
 
 ### Findings
 
-**Opus does not seem to need the skill to find the bug.** Without the plugin,
-Opus already gives the right diagnosis in 20/21 fire runs, usually after
-running the user's script once (2–4 turns), including both bugs in `dbg-07`
-(3/3) and "no bug, physics-limited" in `dbg-06` (3/3). The one miss is a
-`dbg-04` run that failed the diagnosis rubric. The positive Δ (+0.10 on fire
-cases) comes almost entirely from `no-fabrication` (20/21 with, 17/21 without):
+**Opus does not need the skill.** Without the plugin, Opus gives the right
+diagnosis in 21/21 fire runs, usually after running the user's script once
+(2–3 turns), including both bugs in `dbg-07` and "no bug, physics-limited" in
+`dbg-06`, and passes `no-fabrication` in 21/21. With the plugin it does the
+same work in a more systematic report (4–7 turns), and the Δ is slightly
+negative (−0.06) because of grader artefacts rather than worse answers:
 
-- `dbg-05` (prose only, +0.50): without the plugin Opus answers in one turn
-  with a correct derivation from the numbers in the prompt (threshold
-  `eps·α/2 = 50` vs `α·Opᴴy ≲ 1e-2`, `eps_max = 2·max|Opᴴy|`), but the judge
-  failed all three runs as reporting values no tool produced. With the plugin
-  Opus builds a small reproduction and measures them. See Known limitations:
-  this is at least partly a grader artefact.
-- `dbg-06` (+0.17) and `dbg-04` (+0.17): one run each without the plugin
-  failed, on `no-fabrication` (`dbg-06`) and on the diagnosis (`dbg-04`).
-- `dbg-03` (−0.13): one run with the plugin wrote a long report with many
-  measured values (null-space fraction, an `epsR` sweep) and failed
-  `no-fabrication` on a 2–1 judge vote.
+- `dbg-03` (−0.27): two runs with the plugin failed `no-fabrication`. In the
+  run checked by hand, every number in the report (‖Op‖, the relative error,
+  18/60 significant singular values, the `epsR` sweep) is in the tool output,
+  but the tool result holding most of them was elided from the trace the
+  judge saw (see Known limitations).
+- `dbg-04` (−0.17): one run with the plugin failed the diagnosis although it
+  weighted the blocks by 1/σ and verified model error 0.001. It explained that
+  the gravity block alone leaves a null space that only dataset 1 can
+  constrain, which the judge read as blaming the null space. The rubric has
+  since been reworded to allow this explanation.
+- `dbg-01`: in 2/3 runs with the plugin Opus answered directly without calling
+  the skill (and passed).
+- `dbg-09` (−0.11): as for Haiku, one answer with the plugin mentioned PyLops
+  for a SciPy question.
 
 **Haiku benefits from the skill, mostly by running the checks instead of
 guessing.** The correct diagnosis rises from 7/21 to 16/21 fire runs. The
@@ -310,15 +313,22 @@ Limits of the Haiku uplift:
   the repository README. With an editable install, runs fail with
   `No module named 'pylops'` and cannot measure anything.
 - The trace passed to the `no-fabrication` judge is truncated for long runs
-  ("…N messages elided…"). Haiku runs with the plugin are longer (7–13 turns vs 1–7),
-  so they are more exposed to a value whose tool output was elided being judged
-  unsupported.
-- `no-fabrication` is strict with answers that make no tool calls: it failed
-  all three Opus runs of `dbg-05` without the plugin, although they derive
-  their numbers from the prompt and label the rest as estimates ("probably
-  around 1e-3"), which the rubric allows. This inflates the Opus Δ on `dbg-05`
-  (+0.50); the Opus uplift from better-supported numbers is smaller than the
-  table suggests.
+  ("…N messages elided…"). Runs with the plugin are longer (Haiku 7–13 turns vs
+  1–7, Opus 4–7 vs 2–3), so they are more exposed to a value whose tool output
+  was elided being judged unsupported; this is the cause of the Opus `dbg-03`
+  failures.
+- `no-fabrication` distinguishes values presented as measured (must match a
+  tool result) from values derived from the prompt or labelled as estimates
+  (always allowed). An earlier, stricter wording failed correct one-turn
+  answers that derived their numbers from the prompt. The Opus run uses the
+  current wording; the Haiku run used the earlier one, so its
+  `no-fabrication` counts (13/21 with, 12/21 without) may be slightly low in
+  both arms.
+- The `dbg-04` diagnosis criterion against "physics-limited" conclusions was
+  reworded after the runs to allow the (correct) explanation that the gravity
+  block alone leaves a null space only dataset 1 can constrain. Under the
+  current wording one Opus run with the plugin would likely pass (Opus
+  `dbg-04` with ~1.00).
 - The judges' reasoning is not stored in `aggregate-result.json` (only the
   votes); use `--keep-temp` to keep the traces for spot checks.
 - `dbg-08` grades the answer quality, which with the plugin installed can be
