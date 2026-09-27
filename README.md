@@ -89,6 +89,7 @@ The `pylops` plugin currently has evals for:
 | Skill | Folder | Prefix |
 | ----- | ------ | ------ |
 | `solve-inverse-problem` | `evals/solve-inverse-problem/` | `sip-` |
+| `debug-inversion` | `evals/debug-inversion/` | `dbg-` |
 
 `solve-inverse-problem` cases (each asks for a script `invert.py` that is run and prints `SNR_DB=<value>` for the inverted model):
 
@@ -96,6 +97,34 @@ The `pylops` plugin currently has evals for:
 | ----- | -------------- |
 | `sip-01`–`sip-04` | Inversions with a trap for the naive approach (blocky model under blur, outliers in the data, data of order 1e-7 with PyLops-native solvers, compressive sensing in the DCT): graded on the SNR reached, the prior chosen, not using the true model inside the inversion, and on reporting the residual vs the noise level and how the solver stopped |
 | `sip-05`–`sip-06` | Negative cases next to sibling skills (a broken operator for `debug-inversion`, an L-curve request for `tune-regularization`): the skill should *not* trigger |
+
+`debug-inversion` cases (each shares a misbehaving inversion, as a script or in prose, and asks what is wrong):
+
+| Cases | What they test |
+| ----- | -------------- |
+| `dbg-01`–`dbg-07` | A wrong adjoint (off-by-one slice, missing conjugate, forward instead of reverse cumsum), a missing complex `dtype`, badly scaled stacked blocks, an `eps` far too large for `fista`, a result limited by the physics rather than a bug, and a case with two independent bugs: graded on the diagnosis and fix, and on not reporting values that no command in the run produced |
+| `dbg-08`–`dbg-09` | Negative cases (choosing a solver for a new problem, a SciPy optimisation question): the skill should *not* trigger |
+
+### Requirements
+
+Most cases let the agent write and run Python (e.g. a dot-test or the user's
+script), so the eval needs:
+
+- **PyLops (with NumPy and SciPy) installed as a regular, non-editable package
+  in the Python that is first on `PATH` when you start `claude plugin eval`.**
+  The runs are sandboxed and can only read a few locations outside their working
+  directory: an editable install (`pip install -e`) of a PyLops checkout
+  elsewhere on disk fails inside the sandbox with `No module named 'pylops'`,
+  and the sandbox also blocks installing packages from PyPI. If your usual
+  environment has an editable install, put another one first on `PATH` for the
+  run, e.g. `PATH=/path/to/env/bin:$PATH claude plugin eval ...`, and check it
+  with `python -c "import pylops; print(pylops.__file__)"` (the path must be
+  inside that environment's `site-packages`).
+- `--allow-tools "Write,Bash"`, as in the commands below. Without it, cases
+  that expect scripts to be run cannot pass in either arm.
+
+Both apply to every eval suite in this repository. When neither arm runs any code, 
+check the traces for `No module named 'pylops'` before reading anything into the scores.
 
 Run the suites from the plugin folder with `claude plugin eval`; more specifically for the `pylops` plugin:
 
@@ -130,7 +159,8 @@ claude plugin eval . --case 'sip-*' --runs 1 --ablation with-without \
   `opus`; default: your current model). Weaker models can show a larger uplift
   from the skills; keep the judge different from the agent model.
 - `--allow-tools "Write,Bash"` lets the agent write and run Python scripts
-  (e.g. a dot-test); the cases need PyLops installed in the active environment.
+  (e.g. a dot-test); see [Requirements](#requirements) for the Python environment
+  they need.
 - `-j 4` runs up to 4 cases at once; they share your account's rate limit.
 - `--no-publish` keeps the HTML report local instead of uploading it to claude.ai.
 

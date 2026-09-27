@@ -149,3 +149,146 @@ Limits of the Haiku uplift:
 - Run-to-run variance is of the same size as Δ for Opus (a single borderline
   judge vote moves a case by ±0.1–0.2): use `runs: 3` (the default) or more
   before drawing conclusions.
+
+## `debug-inversion` (`dbg-*`)
+
+### What the suite tests
+
+| Case | Input | Problem | Right diagnosis |
+| ---- | ----- | ------- | --------------- |
+| `dbg-01-custom-adjoint-conv` | pasted code | custom convolution `FunctionOperator`, lsqr error ~0.93 with ringing | adjoint slice off by one sample (`nh - 2` → `nh - 1`), not damping/iterations |
+| `dbg-02-vstack-missing-conj` | pasted code | complex steering operator in a `VStack` does not converge | `_rmatvec` is not the Hermitian adjoint (missing conjugate) |
+| `dbg-03-complex-dtype-funcop` | pasted code | crash / wrong result with complex data | `FunctionOperator` built without `dtype="complex128"` |
+| `dbg-04-scaling-stacked-blocks` | pasted code | joint tomography + gravity, dataset 1 ignored, model error ~0.22 | blocks differ by orders of magnitude; weighting by 1/σ brings the error to ~7e-4 |
+| `dbg-05-fista-eps-prose` | prose only | `fista` returns exactly zero for any `niter` | `eps` far above the critical value `max|Opᴴy|`; more iterations cannot help |
+| `dbg-06-physics-limited` | pasted code | Ricker deconvolution stuck at error ~0.85 | no bug: band-limited wavelet / null space; change the prior (sparsity), not the code |
+| `dbg-07-two-bugs` | pasted code | joint inversion stays at error ~0.27 | wrong cumsum adjoint **and** block scaling; each fix alone does not help |
+| `dbg-08-neg-which-solver` | prose | which solver for sparse-spike deconvolution | `debug-inversion` must not fire |
+| `dbg-09-neg-scipy-minimize` | prose | SciPy BFGS logistic regression diverges | must not fire and must not bring in PyLops |
+
+Graders per fire case:
+
+| Grader | Type | Weight | Checks |
+| ------ | ---- | ------ | ------ |
+| `diagnosis` | LLM, final answer | 1 | the right cause and fix for the case, and not blaming damping/iterations/solver (for `dbg-04`, also not blaming the physics) |
+| `no-fabrication` | LLM, trace | 1 | no claims of runs that did not happen, and no measured values that no tool call produced |
+| `fix-token` | regex, final answer | 0.5 | the key fix in the answer (e.g. `nh - 1` or `Convolve1D`, a conjugate transpose, `dtype=complex`, a reversed cumsum); `dbg-01`–`03` and `dbg-07` only |
+| `trigger` | `tool_used: Skill` | – | display only under ablation (not scored) |
+
+The negative cases check that the skill is not called (`tool_used`, max 0) and
+grade the answer to the actual question; `dbg-09` also fails if the answer
+mentions PyLops. The judge is Sonnet (`--judge-model sonnet`).
+
+### Results
+
+Haiku only so far (`--model haiku`, 3 runs per arm, Sonnet judge).
+
+| Case | Haiku with | Haiku without | Haiku Δ |
+| ---- | ---------- | ------------- | ------- |
+| `dbg-01-custom-adjoint-conv` | 0.73 | 0.47 | +0.27 |
+| `dbg-02-vstack-missing-conj` | 0.67 | 0.73 | −0.07 |
+| `dbg-03-complex-dtype-funcop` | 0.87 | 0.87 | 0.00 |
+| `dbg-04-scaling-stacked-blocks` | 0.83 | 0.17 | **+0.67** |
+| `dbg-05-fista-eps-prose` | 0.67 | 0.17 | **+0.50** |
+| `dbg-06-physics-limited` | 0.50 | 0.50 | 0.00 |
+| `dbg-07-two-bugs` | 0.73 | 0.47 | +0.27 |
+| `dbg-08-neg-which-solver` | 1.00 | 1.00 | 0.00 |
+| `dbg-09-neg-scipy-minimize` | 0.78 | 1.00 | −0.22 |
+| **Mean (all cases)** | | | **+0.16** |
+| **Mean (fire cases `dbg-01`–`dbg-07`)** | | | **+0.23** |
+
+| Haiku, fire runs | with | without |
+| ---------------- | ---- | ------- |
+| correct diagnosis (`diagnosis`) | 16/21 | 7/21 |
+| no fabricated values (`no-fabrication`) | 13/21 | 12/21 |
+| skill called (`trigger`) | 21/21 | – |
+
+Report: [report](results/2026-09-27T21-51-09-121Z/report.html).
+
+### Cost and effort
+
+Mean agent cost per run (USD, **excluding the judge**), mean wall time and mean
+turns, from the same run. The judge (Sonnet) adds about $0.10–0.35 per fire run.
+
+| Case | Haiku with | Haiku without |
+| ---- | ---------- | ------------- |
+| `dbg-01-custom-adjoint-conv` | $0.32 · 97 s · 13.3 | $0.21 · 76 s · 6.7 |
+| `dbg-02-vstack-missing-conj` | $0.28 · 109 s · 8.7 | $0.27 · 88 s · 2.7 |
+| `dbg-03-complex-dtype-funcop` | $0.39 · 70 s · 10.0 | $0.27 · 47 s · 10.3 |
+| `dbg-04-scaling-stacked-blocks` | $0.32 · 96 s · 7.0 | $0.21 · 37 s · 1.3 |
+| `dbg-05-fista-eps-prose` | $0.36 · 96 s · 10.0 | $0.12 · 21 s · 1.0 |
+| `dbg-06-physics-limited` | $0.50 · 159 s · 11.3 | $0.23 · 65 s · 4.7 |
+| `dbg-07-two-bugs` | $0.32 · 122 s · 12.0 | $0.11 · 27 s · 1.7 |
+| `dbg-08-neg-which-solver` | $0.09 · 24 s · 4.7 | $0.05 · 15 s · 1.0 |
+| `dbg-09-neg-scipy-minimize` | $0.04 · 16 s · 1.0 | $0.04 · 15 s · 1.0 |
+| **Fire cases, sum per run** | **$2.49** | **$1.41** |
+| **Whole suite, 3 runs per arm** | **$7.88** | **$4.48** |
+
+With the plugin a fire run costs about 75% more: the skill makes Haiku
+reproduce the problem and run dot-tests (7–13 turns) where, without it, Haiku
+often answers from reading the code in 1–3 turns.
+
+### Findings
+
+**Haiku benefits from the skill, mostly by running the checks instead of
+guessing.** The correct diagnosis rises from 7/21 to 16/21 fire runs. The
+largest gains are where reading the code is not enough:
+
+- `dbg-04`: with the skill Haiku measures the block and data norms, weights by
+  1/σ and verifies the fix (2/3 runs); without it, it names "scaling" but either
+  stops there or concludes the error is a resolution limit (0/3).
+- `dbg-05` (prose only): with the skill Haiku builds a small reproduction and
+  compares `eps` with the problem scale (2/3); without it, it guesses
+  "eps is too large" without the numbers (0/3).
+- `dbg-07`: with the skill Haiku reports both bugs in 2/3 runs; without it, it
+  finds one of the two (0/3).
+
+Parts of the skill that matter for Haiku (earlier versions of the skill
+without them showed no uplift):
+
+- An explicit "carry out these steps yourself, now" paragraph. Without it,
+  Haiku often ended its turn right after loading the skill ("the skill is
+  running diagnostics in the background… I'll report back") with no answer;
+  with it, this happened in 0/21 fire runs.
+- For prose-only reports such as `dbg-05`, reasoning from the numbers or
+  building a reproduction instead of stopping to ask for the script.
+- Continuing through the remaining checks after one fails, instead of
+  stopping at the first: otherwise Haiku stops after the wrong adjoint in
+  `dbg-07` and misses the block scaling.
+- A report that separates checks that were run from checks that were not, and
+  tested fixes from untested ones. Without it, Haiku filled in checks it never
+  ran (e.g. "both blocks pass the dot-test" when only the full operator was
+  tested) and concluded "physically limited" after a weighting fix it had
+  implemented wrongly.
+
+Limits of the Haiku uplift:
+
+- `no-fabrication` still fails in 8/21 fire runs with the plugin (9/21
+  without): long reports with many numbers leave more room for an unsupported
+  value.
+- `dbg-02`, `dbg-03`, `dbg-06`: Haiku without the plugin already finds the
+  bug by reading the code (a missing conjugate or dtype, a passing dot-test),
+  so Δ ≈ 0.
+- `dbg-09`: in 1/3 runs with the plugin the answer ended by advertising
+  `/pylops:debug-inversion` for a SciPy question, which the `no-pylops` check
+  fails. Minor over-reach from the plugin being installed, not from the skill
+  being called.
+- The baseline varies between runs: in an earlier run, with a more lenient
+  `dbg-04` rubric, Haiku without the plugin had 12/21 correct diagnoses (7/21
+  here). Part of the Δ is therefore run-to-run variance; read single-case Δs
+  with that in mind.
+
+### Known limitations of the graders
+
+- The runs need PyLops as a regular (non-editable) install first on `PATH`; see
+  the repository README. With an editable install, runs fail with
+  `No module named 'pylops'` and cannot measure anything.
+- The trace passed to the `no-fabrication` judge is truncated for long runs
+  ("…N messages elided…"). Runs with the plugin are longer (7–13 turns vs 1–7),
+  so they are more exposed to a value whose tool output was elided being judged
+  unsupported.
+- The judges' reasoning is not stored in `aggregate-result.json` (only the
+  votes); use `--keep-temp` to keep the traces for spot checks.
+- `dbg-08` grades the answer quality, which with the plugin installed can be
+  influenced by `solve-inverse-problem` (asking clarifying questions instead of
+  answering, which can hit the 8-turn limit).
