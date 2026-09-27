@@ -72,20 +72,96 @@ Copy a skill folder (e.g. `plugins/pylops/skills/wrap-operator/`) into the
 skills directory your agent reads from (e.g. `.agents/skills/` or
 `.claude/skills/`).
 
+## Evals (Claude Code only)
+
+Each plugin can ship an eval suite under `plugins/<plugin>/evals/` that measures
+whether its skills actually help. Cases are grouped in one subfolder per skill
+(`evals/<skill>/`) and their names start with a short skill prefix, so a single
+skill can be run on its own with `--case '<prefix>-*'`. Every case is a folder
+with a `prompt.md` (the user request, plus run settings in the front matter) and
+a `graders/` folder of pass/fail checks: LLM-judged rubrics (e.g. "uses a
+robust data misfit for data with outliers") and deterministic checks (e.g. "the
+script printed an SNR above the threshold"). Each skill keeps at least one negative
+case, so a filtered run still checks that the skill does not over-trigger.
+
+The `pylops` plugin currently has evals for:
+
+| Skill | Folder | Prefix |
+| ----- | ------ | ------ |
+| `solve-inverse-problem` | `evals/solve-inverse-problem/` | `sip-` |
+
+`solve-inverse-problem` cases (each asks for a script `invert.py` that is run and prints `SNR_DB=<value>` for the inverted model):
+
+| Cases | What they test |
+| ----- | -------------- |
+| `sip-01`–`sip-04` | Inversions with a trap for the naive approach (blocky model under blur, outliers in the data, data of order 1e-7 with PyLops-native solvers, compressive sensing in the DCT): graded on the SNR reached, the prior chosen, not using the true model inside the inversion, and on reporting the residual vs the noise level and how the solver stopped |
+| `sip-05`–`sip-06` | Negative cases next to sibling skills (a broken operator for `debug-inversion`, an L-curve request for `tune-regularization`): the skill should *not* trigger |
+
+Run the suites from the plugin folder with `claude plugin eval`; more specifically for the `pylops` plugin:
+
+```bash
+cd plugins/pylops
+
+# All skills: each case runs 3 times with and without the plugin
+claude plugin eval . --ablation with-without --judge-model sonnet --allow-tools "Write,Bash" -j 4
+
+# One skill only (here solve-inverse-problem)
+claude plugin eval . --case 'sip-*' --ablation with-without \
+  --judge-model sonnet --allow-tools "Write,Bash" -j 4
+
+# Same with a cheaper agent model
+claude plugin eval . --case 'sip-*' --model haiku --ablation with-without \
+  --judge-model sonnet --allow-tools "Write,Bash" -j 4
+
+# Quick check: one run each, report kept local
+claude plugin eval . --case 'sip-*' --runs 1 --ablation with-without \
+  --judge-model sonnet --allow-tools "Write,Bash" --no-publish
+```
+
+- `--ablation with-without` also runs a baseline without the plugin and reports
+  the score difference, i.e. the uplift the skills provide. A run over all skills
+  blends their deltas: run each skill on its own (`--case '<prefix>-*'`) for its
+  headline uplift.
+- `--case <glob>` filters cases by name; `--runs`, `-j` and the other flags work
+  the same with or without it.
+- `--judge-model sonnet` uses Sonnet instead of the default Haiku to grade the
+  rubrics, which is more reliable for technical answers.
+- `--model <model>` sets the model of the agent under test (`haiku`, `sonnet` or
+  `opus`; default: your current model). Weaker models can show a larger uplift
+  from the skills; keep the judge different from the agent model.
+- `--allow-tools "Write,Bash"` lets the agent write and run Python scripts
+  (e.g. a dot-test); the cases need PyLops installed in the active environment.
+- `-j 4` runs up to 4 cases at once; they share your account's rate limit.
+- `--no-publish` keeps the HTML report local instead of uploading it to claude.ai.
+
+Results (`aggregate-result.json` and `report.html`) are written to
+`plugins/<plugin>/evals/results/<timestamp>/`.
+
+Findings from the runs (scores, uplift per model, known grader limitations) are
+recorded per skill in [`plugins/pylops/evals/README.md`](plugins/pylops/evals/README.md).
+
+To add a new case, run `claude plugin eval init` from the plugin folder for a guided setup, or `claude plugin eval init --bare <name>` for a blank template, and follow the structure of the existing cases: put the case in `evals/<skill>/` and start its name with the skill's prefix.
+
 ## Contributing
 
-Add a skill as `plugins/<plugin>/skills/<skill-name>/SKILL.md` (`<plugin>` is
+Contributions are welcome and greatly appreciated!
+
+To add or modify a skill:
+
+- Add/modify a skill as `plugins/<plugin>/skills/<skill-name>/SKILL.md` (`<plugin>` is
 `pylops`, `pylops-mpi` or `pyproximal`), with any reference files next to it.
 A new plugin also needs its own `plugins/<plugin>/.claude-plugin/plugin.json` and
 an entry in `.claude-plugin/marketplace.json`.
 
-Then bump `version` in `plugins/<plugin>/.claude-plugin/plugin.json` and check that the skill is picked up:
+- Add new evals and run them (see ``Evals (Claude Code only)`` for more details). This provides evidence that the new skill provides an uplift (or not!)
 
-```bash
-npx skills add . --list
-claude plugin validate --strict .
-for p in plugins/*/; do claude plugin validate --strict "$p"; done
-```
+- Bump `version` in `plugins/<plugin>/.claude-plugin/plugin.json` and check that the skill is picked up:
+
+    ```bash
+    npx skills add . --list
+    claude plugin validate --strict .
+    for p in plugins/*/; do claude plugin validate --strict "$p"; done
+    ```
 
 **Note:** keep the instructions agent-agnostic: describe actions (e.g. "fetch the URL", "run the tests") rather than tool names of a specific agent.
 
