@@ -1,12 +1,16 @@
 ---
 name: debug-inversion
-description: Diagnose a PyLops inversion that does not converge, diverges, stalls, returns NaNs, or gives a wrong-looking model - check adjoints with the dot-test block by block, dtypes and complex handling, dims/dimsd ordering and flattening, scaling and conditioning, solver choice and stopping, regularisation and noise, and report evidence-backed findings with fixes. Use when the user says "my PyLops inversion doesn't converge", "cgls/lsqr returns garbage", "the cost doesn't decrease", "fista blows up", "the result is all zeros/noise", "dottest fails".
+description: Use whenever a user shares PyLops code or results that misbehave and asks what is wrong - a crash or traceback (dtype/casting errors, shape mismatches), a solver (lsqr, cgls, cg, fista, ista, spgl1, regularized_inversion, splitbregman) that stalls, diverges, returns NaNs, zeros, ringing or a wrong model, one dataset or block being ignored in a stacked/joint inversion, or a custom FunctionOperator/LinearOperator that may have a wrong adjoint - even when the bug looks obvious from the code. Diagnoses with evidence (block-by-block dot-tests incl. complex, dtype and dims checks, operator/data scaling, solver and eps/damp choice), then proposes the smallest fix and verifies it. Not for choosing a solver for a new, working setup (use solve-inverse-problem) or picking regularisation weights (use tune-regularization).
 ---
 
 Goal: find **why** the user's inversion misbehaves, with evidence for each claim,
 and propose the smallest fix. Diagnose first; change the user's code only after
 reporting the findings (or when asked to fix). Never make a failing dot-test pass
 by loosening its tolerance.
+
+Carry out these steps yourself, now, in this conversation: nothing runs in the
+background and no one else will report back. Do not end your turn until you have
+given the user the report of section 2.
 
 ## 0. Reproduce
 
@@ -16,6 +20,15 @@ by loosening its tolerance.
   tuple (`istop`, iterations, cost history), shapes and dtypes of `Op`, `y`, `x0`.
 - If it is slow, reproduce on a smaller size (fewer samples, fewer sources) that
   still shows the problem. Keep that reduced case for the checks below.
+- If the user described the problem in words and gave no script, do not stop to
+  ask for one: build a minimal reproduction from the numbers they gave (operator
+  type, sizes, amplitudes, solver call), or reason from those numbers directly
+  (e.g. compare `eps`, `damp`, `tol` with `‖Op‖` and `‖Opᴴ y‖`). Ask for the code
+  only if the description does not pin down the problem.
+- If Python or PyLops cannot be run here, say so once and reason from the code
+  and the numbers the user gave. Never present a value as measured (dot-test
+  result, error, cost, norm) unless a command you ran printed it; label anything
+  else as an estimate.
 
 `reference/diagnostics.py` contains helpers for the checks below (import or copy
 them next to the user's script; do not add them to the user's package unless
@@ -23,7 +36,11 @@ asked).
 
 ## 1. Run the checks in this order
 
-Stop at the first check that fails clearly, report it, and only then continue.
+When a check fails, note the finding and its fix, then continue with the
+remaining checks: an inversion often has more than one problem (e.g. a wrong
+adjoint **and** badly scaled blocks), and fixing only the first may not improve
+the result. After fixing a problem, re-run the inversion; if the result is still
+poor, the next check is where to look.
 
 1. **Adjoint (dot-test)** – `pylops.utils.dottest(Op, *Op.shape, complexflag=...)`
    on the full operator **and on every block** (`dottest_blocks` walks
@@ -75,6 +92,19 @@ Stop at the first check that fails clearly, report it, and only then continue.
 For each finding, give: the check, the evidence (numbers, plot path, the failing
 block name), the likely cause, and the proposed fix. Rank by impact. Then either
 apply fixes (if the user asked) and re-run to show the improvement, or list the
-exact changes to make. If nothing is wrong with the setup and the result is
-limited by the physics / data (null space, noise, limited aperture), say so
-explicitly rather than tweaking parameters.
+exact changes to make.
+
+Keep what you ran apart from what you did not:
+
+- Mark each check as **run** (quote the command's output it rests on) or **not
+  run** (say why, and label any statement about it as an expectation). Do not
+  report a check as passed for a part you did not test, e.g. "every block passes
+  the dot-test" when only the full operator was tested.
+- For each proposed fix, say whether you tested it and what it changed. If a fix
+  you tested did not help, say so explicitly and check your implementation of it
+  before concluding that the problem is elsewhere.
+
+Say the result is limited by the physics / data (null space, noise, limited
+aperture) only when the operator and the data weighting are correct and a
+tested fix did not improve it - not as a fallback when a fix did not work.
+In that case say so explicitly rather than tweaking parameters.
