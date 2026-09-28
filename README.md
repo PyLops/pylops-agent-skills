@@ -105,13 +105,27 @@ The `pylops` plugin currently has evals for:
 | `dbg-01`–`dbg-07` | A wrong adjoint (off-by-one slice, missing conjugate, forward instead of reverse cumsum), a missing complex `dtype`, badly scaled stacked blocks, an `eps` far too large for `fista`, a result limited by the physics rather than a bug, and a case with two independent bugs: graded on the diagnosis and fix, and on not reporting values that no command in the run produced |
 | `dbg-08`–`dbg-09` | Negative cases (choosing a solver for a new problem, a SciPy optimisation question): the skill should *not* trigger |
 
+The `pyproximal` plugin currently has evals for:
+
+| Skill | Folder | Prefix |
+| ----- | ------ | ------ |
+| `solve-nonsmooth-problem` | `evals/solve-nonsmooth-problem/` | `sns-` |
+
+`solve-nonsmooth-problem` cases (each asks for a script `invert.py` that is run and prints `SNR_DB=<value>` for the inverted model):
+
+| Cases | What they test |
+| ----- | -------------- |
+| `sns-01`–`sns-04` | Non-smooth problems with a trap for the naive approach (bounds on a blurred noisy model, two signals with a shared sparse support, low-rank matrix completion, a median filter as a Plug-and-Play prior): graded on writing the objective and solving it with a PyProximal solver, deriving step sizes from operator norms, the SNR reached, reporting convergence, and not using the true model inside the inversion or to choose its parameters |
+| `sns-05`–`sns-06` | Negative cases (plain Tikhonov regularisation, a failing dot-test): the skill should *not* trigger |
+
 ### Requirements
 
 Most cases let the agent write and run Python (e.g. a dot-test or the user's
 script), so the eval needs:
 
-- **PyLops (with NumPy and SciPy) installed as a regular, non-editable package
-  in the Python that is first on `PATH` when you start `claude plugin eval`.**
+- **PyLops (with NumPy and SciPy), and PyProximal for the `pyproximal` plugin,
+  installed as regular, non-editable packages in the Python that is first on
+  `PATH` when you start `claude plugin eval`.**
   The runs are sandboxed and can only read a few locations outside their working
   directory: an editable install (`pip install -e`) of a PyLops checkout
   elsewhere on disk fails inside the sandbox with `No module named 'pylops'`,
@@ -167,8 +181,12 @@ claude plugin eval . --case 'sip-*' --runs 1 --ablation with-without \
 Results (`aggregate-result.json` and `report.html`) are written to
 `plugins/<plugin>/evals/results/<timestamp>/`.
 
+The same commands work for the `pyproximal` plugin from `plugins/pyproximal`
+(e.g. `--case 'sns-*'`).
+
 Findings from the runs (scores, uplift per model, known grader limitations) are
-recorded per skill in [`plugins/pylops/evals/README.md`](plugins/pylops/evals/README.md).
+recorded per skill in [`plugins/pylops/evals/README.md`](plugins/pylops/evals/README.md)
+and [`plugins/pyproximal/evals/README.md`](plugins/pyproximal/evals/README.md).
 
 To add a new case, run `claude plugin eval init` from the plugin folder for a guided setup, or `claude plugin eval init --bare <name>` for a blank template, and follow the structure of the existing cases: put the case in `evals/<skill>/` and start its name with the skill's prefix.
 

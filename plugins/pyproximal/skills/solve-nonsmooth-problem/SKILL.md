@@ -64,9 +64,7 @@ State the choice and why.
 - Inner solves: `L2(Op=..., niter=...)` needs an inner iterative solve at every
   prox; keep `niter` small (10–30) with `warm=True`, or move `Op` into `K` and use
   `L2(b=y)` instead.
-- Regularisation weights: start from a scale argument, then tune with the
-  `pylops` plugin skill `tune-regularization` (same sweep logic, one solve per
-  weight).
+- Choose every free parameter (regularisation weight, threshold, `tau`/`mu` for ADMM/PnP, rank, `niter`, denoiser strength) with a criterion that does not use the true model: discrepancy principle (residual ≈ noise level), held-out observed data, L-curve, or a stated scale argument. Never pick a value because it gives the best SNR against the true model; that is an oracle, and it will not transfer to real data. The same applies to information that is only known from how the synthetic was built (the true support, number of components or rank).
 
 ## 4. Write, run, verify
 
@@ -78,8 +76,7 @@ constraints via `PrimalDual`):
   a fixed `niter` shown to be enough by the cost curve;
 - check constraints are satisfied (e.g. bounds), and compare with the
   unconstrained / L2 solution to show what the non-smooth term changes;
-- use a synthetic with known model first when possible
-  (`pylops.utils.metrics.snr`).
+-  use a synthetic with known model first when possible, but only to *evaluate* the result (`pylops.utils.metrics.snr` of the final model); the true model must not feed into the solve or into choosing its parameters. A table of SNR vs parameter can be shown as a diagnostic, next to the parameter picked by the truth-free criterion.
 
 If the cost oscillates or diverges, the step sizes violate the conditions above
 (recompute `‖K‖²`), or `K` fails the dot-test
@@ -88,5 +85,4 @@ If the cost oscillates or diverges, the step sizes violate the conditions above
 ## 5. Hand off
 
 Report: the objective as written, the proxes/solver chosen and why, the step
-sizes and how they were derived, convergence evidence, the result compared with a
-baseline, and parameters left to tune.
+sizes and how they were derived, how each free parameter was chosen (the truth-free criterion used), convergence evidence, the result compared with a baseline, and parameters left to tune.
