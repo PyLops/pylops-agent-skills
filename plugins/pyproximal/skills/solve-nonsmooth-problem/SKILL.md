@@ -1,6 +1,6 @@
 ---
 name: solve-nonsmooth-problem
-description: Formulate and solve non-smooth, constrained or non-convex inverse problems with PyProximal on top of PyLops operators - total variation, L1/sparsity in a transform, group sparsity, box/positivity/ball/affine constraints, low rank, plug-and-play denoisers - by writing the objective as f(x) + g(Kx), picking proximal operators and a solver (ProximalGradient, ADMM, LinearizedADMM, PrimalDual, ...), setting step sizes from operator norms, and verifying convergence. Use when the user asks "add TV regularisation", "positivity / bound constraints in my PyLops inversion", "L1 with a non-orthogonal transform", "use PyProximal", "ADMM / primal-dual for my problem".
+description: Formulate and solve non-smooth, constrained or non-convex inverse problems with PyProximal on top of PyLops operators - total variation, L1/sparsity in a transform, group/joint sparsity across several signals, box/positivity/ball/affine constraints, low-rank matrix completion (nuclear norm), plug-and-play priors with any denoiser (median filter, BM3D, a network) - by writing the objective as f(x) + g(Kx), picking proximal operators and a solver (ProximalGradient, ADMM, LinearizedADMM, PrimalDual, ...), setting step sizes from operator norms, and verifying convergence. Use when the user asks "add TV regularisation", "positivity / bound constraints in my PyLops inversion", "L1 with a non-orthogonal transform", "signals that share the same sparse support", "fill in missing entries of a low-rank matrix / table", "use a denoiser or median filter as the prior inside the inversion", "use PyProximal", "ADMM / primal-dual for my problem". Not for purely quadratic regularisation (Tikhonov, damping, smoothing with a derivative operator): that is plain least squares, use the pylops skill solve-inverse-problem.
 ---
 
 Goal: a runnable script that solves the user's non-smooth problem with a
@@ -44,13 +44,21 @@ before coding, and show it to the user:
 |---|---|
 | `f` smooth (e.g. L2 data) + simple `g` on `x` (L1, Box) | `ProximalGradient(proxf, proxg, x0, epsg, tau, acceleration="fista")` |
 | `f` + `g(Kx)` with `K` non-trivial (TV, analysis L1 with non-orthogonal transform) | `PrimalDual(proxf, proxg, K, x0, tau, mu)` or `LinearizedADMM(proxf, proxg, K, x0, tau, mu)` |
+| several signals sharing a sparse support (joint / group sparsity) | one joint problem: stack the coefficients (`BlockDiag` of the per-signal operators), `g = L21(ndim=n_signals)` in `ProximalGradient`; not one L1 problem per signal |
+| low-rank matrix from partially observed entries | `ProximalGradient` with `L2(Op=Restriction(...), b=y)` and `Nuclear((n, m))`; `‖Restriction‖ = 1`, so `tau = 1` |
 | `½‖Op x − b‖² + g(Ax)` with a good inner least-squares solver | `ADMML2(proxg, Op, b, A, x0, tau)` |
 | `f(x) + g(x)` both non-smooth with cheap proxes | `ADMM` or `DouglasRachfordSplitting` |
 | constraints + data + regulariser | `PrimalDual` with `f = Box(...)`, `g = VStack([L2(b=y), lam*L21])`, `K = VStack([Op, Gradient])` |
 | many terms | `GeneralizedProximalGradient`, `PPXA`, `ConsensusADMM` |
-| learned/denoiser prior | `pnp.PlugAndPlay` |
+| denoiser as prior (median filter, BM3D, network) | `pnp.PlugAndPlay(proxf, denoiser, dims, x0, solver=ProximalGradient or ADMM, tau=...)`; `denoiser(x, tau)` receives `x` reshaped to `dims` and runs at every iteration (applying it once to an `lsqr` result is post-processing, not PnP) |
 
 State the choice and why.
+
+Use the PyProximal solver and proximal operators from the table; do not
+hand-write the iteration (gradient + clip, SVT loops, "median filter then
+lsqr" alternations) or switch to scipy/cvxpy. If the first formulation does
+not work after one or two attempts, go back to the table and use the row that
+matches the problem structure instead of trying variants of the same approach.
 
 ## 3. Step sizes and parameters
 
@@ -84,5 +92,5 @@ If the cost oscillates or diverges, the step sizes violate the conditions above
 
 ## 5. Hand off
 
-Report: the objective as written, the proxes/solver chosen and why, the step
-sizes and how they were derived, how each free parameter was chosen (the truth-free criterion used), convergence evidence, the result compared with a baseline, and parameters left to tune.
+Report, with numbers from the run: the objective as written, the proxes/solver chosen and why, the step
+sizes and how they were derived, how each free parameter was chosen (the truth-free criterion used), convergence evidence as the iterations used and the cost at the start and end (from the callback, not only the `niter` you set), the result compared with a baseline, and parameters left to tune.
