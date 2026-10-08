@@ -9,6 +9,12 @@ Each run's HTML report is linked below (`results/<timestamp>/report.html`,
 next to its `aggregate-result.json`). Scores are on a 0–1 scale; a case passes
 only with a score of 1.
 
+Models are named with their version (e.g. Haiku 4.5, Haiku 5.5), because
+aliases such as `haiku` move to newer models over time and the suites are
+compared across models. The agent model ID of each run is listed next to its
+report. When adding a run, pass the full model ID to `--model` (e.g.
+`--model claude-haiku-5-5`) and label its columns with that version.
+
 ## `solve-nonsmooth-problem` (`sns-*`)
 
 ### What the suite tests
@@ -48,12 +54,12 @@ adjoint and its fix).
 ### Results
 
 Both models were run with 3 runs per arm on the current skill. The judge is
-Opus for the Sonnet run and Sonnet for the Haiku run, so it is never the agent
-model. `claude plugin eval` has no effort setting and runs each case with its
+Opus 5.5 for the Sonnet 5.5 run and Sonnet 5.5 for the Haiku 4.5 run, so it is
+never the agent model. `claude plugin eval` has no effort setting and runs each case with its
 own configuration, so agent and judge ran at the models' default effort
 (chosen per turn), not at the user's `effortLevel`.
 
-| Case | Sonnet with | Sonnet without | Sonnet Δ | Haiku with | Haiku without | Haiku Δ |
+| Case | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ |
 | ---- | ----------- | -------------- | -------- | ---------- | ------------- | ------- |
 | `sns-01-box-noisy-l2` | 0.86 | 0.92 | −0.06 | 0.98 | 0.67 | **+0.31** |
 | `sns-02-group-sparsity` | 1.00 | 0.74 | **+0.26** | 0.79 | 0.58 | +0.20 |
@@ -66,19 +72,25 @@ own configuration, so agent and judge ran at the models' default effort
 
 Reports:
 
-- Sonnet (`--model sonnet --judge-model opus`):
+- Sonnet 5.5 (`--model sonnet --judge-model opus`, agent `claude-sonnet-5-5`,
+  judge Opus 5.5):
   [report](results/2026-09-29T20-31-30-286Z/report.html).
-- Haiku (`--model haiku --judge-model sonnet`):
+- Haiku 4.5 (`--model haiku --judge-model sonnet`, agent `claude-haiku-4-5-20251001`,
+  judge Sonnet 5.5):
   [report](results/2026-09-29T20-10-19-343Z/report.html).
+
+The graders of this suite keep only final answers and scripts, so these two
+runs do not store the agent model ID; the versions above are those the
+`sonnet` and `haiku` aliases resolved to at the time of the runs.
 
 ### Cost and effort
 
 Mean agent cost per run (USD, **excluding the judge**), mean wall time and mean
-turns, from the same runs. The Opus judge adds about $0.21–0.36 per fire run
-and $0.02–0.04 per negative run; the Sonnet judge about $0.05–0.20 and
+turns, from the same runs. The Opus 5.5 judge adds about $0.21–0.36 per fire run
+and $0.02–0.04 per negative run; the Sonnet 5.5 judge about $0.05–0.20 and
 $0.01–0.04.
 
-| Case | Sonnet with | Sonnet without | Haiku with | Haiku without |
+| Case | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without |
 | ---- | ----------- | -------------- | ---------- | ------------- |
 | `sns-01-box-noisy-l2` | $0.45 · 67 s · 6.3 | $0.49 · 92 s · 8.3 | $0.28 · 113 s · 23.7 | $0.12 · 58 s · 4.7 |
 | `sns-02-group-sparsity` | $0.46 · 71 s · 7.3 | $0.40 · 55 s · 3.0 | $0.45 · 222 s · 26.0 | $0.38 · 204 s · 21.0 |
@@ -89,25 +101,25 @@ $0.01–0.04.
 | **Fire cases, sum per run** | **$1.67** | **$1.79** | **$1.20** | **$0.88** |
 | **Whole suite, 3 runs per arm** | **$5.50** | **$5.86** | **$3.98** | **$3.04** |
 
-- For Sonnet the plugin costs nothing extra: fire runs cost about the same in
+- For Sonnet 5.5 the plugin costs nothing extra: fire runs cost about the same in
   both arms (slightly less with it on `sns-04`, where the arm without the
   plugin sweeps `tau` against the true model).
-- For Haiku a fire run with the plugin costs about 35% more, mostly on
+- For Haiku 4.5 a fire run with the plugin costs about 35% more, mostly on
   `sns-01` and `sns-03` (more checks, parameter selection and reporting).
-- Judge included, the Sonnet suite cost about $19.30 and the Haiku suite
+- Judge included, the Sonnet 5.5 suite cost about $19.30 and the Haiku 4.5 suite
   about $9.80. The top-level `costUsd` in each `aggregate-result.json` is the
   agent cost of both arms (judge excluded); per-run judge cost is stored as
   `judgeCostUsd`.
 
 ### Findings
 
-**Sonnet already picks the right formulation; the skill improves how it
-chooses parameters and reports.** Without the plugin Sonnet writes the right
+**Sonnet 5.5 already picks the right formulation; the skill improves how it
+chooses parameters and reports.** Without the plugin Sonnet 5.5 writes the right
 objective with a PyProximal solver in 10/12 fire runs (the two misses are
 `sns-02` runs that solved the joint problem without PyProximal), with it in
 12/12. The rest of the Δ comes from the process graders:
 
-| Sonnet, fire runs | with | without |
+| Sonnet 5.5, fire runs | with | without |
 | ----------------- | ---- | ------- |
 | right objective with a PyProximal solver (`objective-formulation`) | 12/12 | 10/12 |
 | reports how the solver stopped (`convergence-reported`) | 12/12 | 3/12 |
@@ -117,8 +129,8 @@ objective with a PyProximal solver in 10/12 fire runs (the two misses are
 
 - The skill asks for every free parameter (weight, `tau` for ADMM/PnP, rank,
   `niter`) to be chosen by a criterion that does not use the true model. With
-  it, Sonnet uses the discrepancy principle, held-out observed entries or a
-  norm-based `tau`, and never tunes on the truth. Without it, Sonnet tunes
+  it, Sonnet 5.5 uses the discrepancy principle, held-out observed entries or a
+  norm-based `tau`, and never tunes on the truth. Without it, Sonnet 5.5 tunes
   against the true model in 6/12 fire runs (`sns-01` 2/3, `sns-03` 1/3,
   `sns-04` 3/3), in `invert.py` or in exploratory runs it then reports.
 - That honesty costs SNR: on `sns-01` the discrepancy principle over-smooths
@@ -126,14 +138,14 @@ objective with a PyProximal solver in 10/12 fire runs (the two misses are
   and on `sns-04` the PnP result with a norm-based `tau` is 17.6–18.9 dB (vs
   20.8 dB). `metric-threshold` fails in 3/3 and 2/3 of these runs, which is
   why `sns-01` shows Δ −0.06 (see Known limitations).
-- `sns-02` (+0.26): without the plugin Sonnet did not use PyProximal in 2/3
+- `sns-02` (+0.26): without the plugin Sonnet 5.5 did not use PyProximal in 2/3
   runs; with it, it used `pyproximal.L21` in 3/3.
 - The skill never fired on the negative cases (0/6).
 
-**Haiku benefits clearly from the skill, in the method as well as in the
+**Haiku 4.5 benefits clearly from the skill, in the method as well as in the
 reporting.** With the plugin the skill fires in 11/12 fire runs, and:
 
-| Haiku, fire runs | with | without |
+| Haiku 4.5, fire runs | with | without |
 | ---------------- | ---- | ------- |
 | right objective with a PyProximal solver (`objective-formulation`) | 9/12 | 0/12 |
 | reports how the solver stopped (`convergence-reported`) | 8/12 | 5/12 |
@@ -150,7 +162,7 @@ reporting.** With the plugin the skill fires in 11/12 fire runs, and:
   without it, hand-written SVT, rank-3 hard thresholding or least squares.
   Two runs with the skill still report choosing the weight against the true
   matrix.
-- `sns-04` (+0.19): the skill fires in 3/3 runs but Haiku still writes its own
+- `sns-04` (+0.19): the skill fires in 3/3 runs but Haiku 4.5 still writes its own
   "gradient step + median filter" loop instead of calling `PlugAndPlay` (one
   run tried it with a wrong import path and fell back to its loop), so
   `objective-formulation` fails in 3/3. The loops are correct proximal-gradient
@@ -159,7 +171,7 @@ reporting.** With the plugin the skill fires in 11/12 fire runs, and:
   description now states that quadratic regularisation belongs to the `pylops`
   plugin.
 
-Parts of the skill that matter for Haiku (each fixes a failure seen with an
+Parts of the skill that matter for Haiku 4.5 (each fixes a failure seen with an
 earlier version of the skill):
 
 - Trigger phrases in the description for joint sparsity, matrix completion and
@@ -168,7 +180,7 @@ earlier version of the skill):
 - The "not for purely quadratic regularisation" sentence in the description:
   without it the skill fired on `sns-05` in 3/3 runs.
 - Solver-table rows for joint sparsity (`L21` over stacked signals) and low
-  rank (`Restriction` + `Nuclear`): without them Haiku solved `sns-02` one
+  rank (`Restriction` + `Nuclear`): without them Haiku 4.5 solved `sns-02` one
   signal at a time and ran out of turns in 3/3 runs.
 - "Use the PyProximal solver, not a hand-written loop; go back to the table
   after one or two failed attempts".
