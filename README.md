@@ -152,8 +152,8 @@ claude plugin eval . --ablation with-without --judge-model sonnet --allow-tools 
 claude plugin eval . --case 'sip-*' --ablation with-without \
   --judge-model sonnet --allow-tools "Write,Bash" -j 4
 
-# Same with a cheaper agent model
-claude plugin eval . --case 'sip-*' --model haiku --ablation with-without \
+# Same with a cheaper agent model, pinned to a model version
+claude plugin eval . --case 'sip-*' --model claude-haiku-5-5 --ablation with-without \
   --judge-model sonnet --allow-tools "Write,Bash" -j 4
 
 # Quick check: one run each, report kept local
@@ -169,9 +169,13 @@ claude plugin eval . --case 'sip-*' --runs 1 --ablation with-without \
   the same with or without it.
 - `--judge-model sonnet` uses Sonnet instead of the default Haiku to grade the
   rubrics, which is more reliable for technical answers.
-- `--model <model>` sets the model of the agent under test (`haiku`, `sonnet` or
-  `opus`; default: your current model). Weaker models can show a larger uplift
-  from the skills; keep the judge different from the agent model.
+- `--model <model>` sets the model of the agent under test (an alias such as
+  `haiku`, `sonnet` or `opus`, or a full model ID such as `claude-haiku-5-5`;
+  default: your current model). Weaker models can show a larger uplift
+  from the skills; keep the judge different from the agent model. Aliases move
+  to newer models over time, so pass the full model ID when the run will be
+  recorded, and name the model with its version (e.g. Haiku 5.5) in the
+  findings READMEs.
 - `--allow-tools "Write,Bash"` lets the agent write and run Python scripts
   (e.g. a dot-test); see [Requirements](#requirements) for the Python environment
   they need.
