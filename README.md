@@ -191,6 +191,16 @@ The same commands work for the `pyproximal` plugin from `plugins/pyproximal`
 Findings from the runs (scores, uplift per model, known grader limitations) are
 recorded per skill in [`plugins/pylops/evals/README.md`](plugins/pylops/evals/README.md)
 and [`plugins/pyproximal/evals/README.md`](plugins/pyproximal/evals/README.md).
+Generate their tables from the results rather than copying numbers by hand:
+[`scripts/eval_tables.py`](scripts/eval_tables.py) takes one results folder per
+model and prints the results and cost tables, plus per-model trigger rates and
+grader pass counts (also split by whether the skill was loaded):
+
+```bash
+python scripts/eval_tables.py \
+  "Opus 5.5=plugins/pylops/evals/results/<timestamp>" \
+  "Haiku 5.5=plugins/pylops/evals/results/<timestamp>"
+```
 
 To add a new case, run `claude plugin eval init` from the plugin folder for a guided setup, or `claude plugin eval init --bare <name>` for a blank template, and follow the structure of the existing cases: put the case in `evals/<skill>/` and start its name with the skill's prefix.
 
