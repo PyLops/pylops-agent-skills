@@ -222,134 +222,130 @@ mentions PyLops. The judge is Sonnet 5.5 (`--judge-model sonnet`).
 
 ### Results
 
-All three models were run with 3 runs per arm and Sonnet 5.5 as the judge.
+All three models were run with 3 runs per arm and Sonnet 5.5 as the judge, on
+the current skill.
 
 | Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ |
 | ---- | ------------- | ---------------- | ---------- | -------------- | ----------------- | ----------- | -------------- | ----------------- | ----------- |
 | `dbg-01-custom-adjoint-conv` | 1.00 | 1.00 | 0.00 | 0.87 | 0.87 | 0.00 | 1.00 | 1.00 | 0.00 |
-| `dbg-02-vstack-missing-conj` | 1.00 | 1.00 | 0.00 | 0.67 | 0.53 | +0.13 | 0.80 | 0.87 | −0.07 |
-| `dbg-03-complex-dtype-funcop` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 0.87 | +0.13 |
-| `dbg-04-scaling-stacked-blocks` | 1.00 | 1.00 | 0.00 | 0.67 | 0.67 | 0.00 | 0.67 | 0.83 | −0.17 |
-| `dbg-05-fista-eps-prose` | 1.00 | 1.00 | 0.00 | 0.67 | 0.50 | +0.17 | 1.00 | 1.00 | 0.00 |
-| `dbg-06-physics-limited` | 1.00 | 1.00 | 0.00 | 0.50 | 0.50 | 0.00 | 1.00 | 1.00 | 0.00 |
-| `dbg-07-two-bugs` | 1.00 | 1.00 | 0.00 | 0.60 | 0.60 | 0.00 | 1.00 | 1.00 | 0.00 |
+| `dbg-02-vstack-missing-conj` | 1.00 | 1.00 | 0.00 | 0.53 | 0.47 | +0.07 | 1.00 | 0.87 | +0.13 |
+| `dbg-03-complex-dtype-funcop` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| `dbg-04-scaling-stacked-blocks` | 0.83 | 1.00 | −0.17 | 1.00 | 0.50 | +0.50 | 0.83 | 0.67 | +0.17 |
+| `dbg-05-fista-eps-prose` | 1.00 | 1.00 | 0.00 | 0.17 | 0.50 | −0.33 | 1.00 | 1.00 | 0.00 |
+| `dbg-06-physics-limited` | 1.00 | 0.83 | +0.17 | 0.50 | 0.33 | +0.17 | 0.83 | 0.83 | 0.00 |
+| `dbg-07-two-bugs` | 1.00 | 1.00 | 0.00 | 1.00 | 0.53 | +0.47 | 1.00 | 1.00 | 0.00 |
 | `dbg-08-neg-which-solver` | 1.00 | 1.00 | 0.00 | 0.83 | 1.00 | −0.17 | 1.00 | 1.00 | 0.00 |
-| `dbg-09-neg-scipy-minimize` | 0.89 | 1.00 | −0.11 | 0.89 | 1.00 | −0.11 | 1.00 | 1.00 | 0.00 |
-| **Mean (all cases)** | | | **−0.01** | | | **0.00** | | | **−0.01** |
-| **Mean (fire cases `dbg-01`–`dbg-07`)** | | | **0.00** | | | **+0.04** | | | **−0.01** |
+| `dbg-09-neg-scipy-minimize` | 1.00 | 1.00 | 0.00 | 0.89 | 1.00 | −0.11 | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **0.00** | | | **+0.07** | | | **+0.03** |
+| **Mean (fire cases `dbg-01`–`dbg-07`)** | | | **0.00** | | | **+0.12** | | | **+0.04** |
 
 | Fire runs | Opus 5.5 with | Opus 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
 | --------- | ------------- | ---------------- | -------------- | ----------------- | -------------- | ----------------- |
-| correct diagnosis (`diagnosis`) | 21/21 | 21/21 | 10/21 | 6/21 | 18/21 | 19/21 |
-| no fabricated values (`no-fabrication`) | 21/21 | 21/21 | 19/21 | 21/21 | 21/21 | 20/21 |
-| skill called (`trigger`) | 21/21 | – | 21/21 | – | 8/21 | – |
+| skill called (`trigger`) | 21/21 | – | 21/21 | – | 21/21 | – |
+| correct diagnosis (`diagnosis`) | 21/21 | 21/21 | 13/21 | 6/21 | 20/21 | 18/21 |
+| no fabricated values (`no-fabrication`) | 20/21 | 20/21 | 17/21 | 19/21 | 20/21 | 20/21 |
+| mean score | 0.98 | 0.98 | 0.72 | 0.60 | 0.95 | 0.91 |
+
+`debug-inversion` never fired on the negative cases (0/18 runs with the plugin
+across the three models).
 
 Reports:
 
-- Opus 5.5 (`--model opus`, agent `claude-opus-5-5`):
-  [report](results/2026-09-28T16-33-37-573Z/report.html).
-- Haiku 4.5 (`--model haiku`, agent `claude-haiku-4-5-20251001`):
-  [report](results/2026-09-28T16-40-57-071Z/report.html).
+- Opus 5.5 (`--model claude-opus-5-5`, agent `claude-opus-5-5`):
+  [report](results/2026-10-09T08-23-36-827Z/report.html).
+- Haiku 4.5 (`--model claude-haiku-4-5-20251001`, agent `claude-haiku-4-5-20251001`):
+  [report](results/2026-10-09T08-44-17-973Z/report.html).
 - Haiku 5.5 (`--model claude-haiku-5-5`, agent `claude-haiku-5-5`):
-  [report](results/2026-10-08T21-20-28-233Z/report.html).
+  [report](results/2026-10-09T08-23-36-776Z/report.html).
 
 ### Cost and effort
 
 Mean agent cost per run (USD, **excluding the judge**), mean wall time and mean
-turns, from the same runs. The judge (Sonnet 5.5) adds about $0.10–0.35 per fire run.
+turns, from the same runs. The judge (Sonnet 5.5) adds about $0.07–0.48 per
+fire run and $0.00–0.12 per negative run.
 
 | Case | Opus 5.5 with | Opus 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
 | ---- | ------------- | ---------------- | -------------- | ----------------- | -------------- | ----------------- |
-| `dbg-01-custom-adjoint-conv` | $0.46 · 32 s · 4.0 | $0.18 · 23 s · 2.0 | $0.36 · 95 s · 15.0 | $0.15 · 60 s · 8.0 | $0.28 · 24 s · 2.3 | $0.17 · 25 s · 2.0 |
-| `dbg-02-vstack-missing-conj` | $0.38 · 33 s · 5.0 | $0.31 · 24 s · 2.0 | $0.28 · 122 s · 13.0 | $0.21 · 69 s · 3.7 | $0.29 · 34 s · 5.7 | $0.28 · 28 s · 2.3 |
-| `dbg-03-complex-dtype-funcop` | $0.39 · 49 s · 6.3 | $0.29 · 31 s · 3.7 | $0.26 · 55 s · 9.3 | $0.22 · 31 s · 6.7 | $0.25 · 37 s · 7.0 | $0.24 · 31 s · 4.7 |
-| `dbg-04-scaling-stacked-blocks` | $0.47 · 54 s · 5.3 | $0.28 · 29 s · 2.0 | $0.28 · 92 s · 7.7 | $0.15 · 35 s · 3.3 | $0.23 · 52 s · 4.3 | $0.18 · 39 s · 2.0 |
-| `dbg-05-fista-eps-prose` | $0.47 · 41 s · 5.0 | $0.29 · 28 s · 1.0 | $0.31 · 98 s · 12.7 | $0.12 · 21 s · 1.0 | $0.19 · 34 s · 3.7 | $0.19 · 24 s · 1.0 |
-| `dbg-06-physics-limited` | $0.45 · 45 s · 5.3 | $0.39 · 37 s · 3.0 | $0.33 · 154 s · 15.3 | $0.17 · 51 s · 4.0 | $0.43 · 47 s · 4.0 | $0.33 · 38 s · 3.3 |
-| `dbg-07-two-bugs` | $0.35 · 37 s · 4.7 | $0.25 · 27 s · 2.3 | $0.31 · 134 s · 11.0 | $0.27 · 85 s · 8.0 | $0.51 · 47 s · 4.0 | $0.37 · 46 s · 2.0 |
-| `dbg-08-neg-which-solver` | $0.19 · 23 s · 4.0 | $0.11 · 20 s · 1.0 | $0.06 · 38 s · 6.3 | $0.04 · 15 s · 1.0 | $0.06 · 13 s · 1.0 | $0.01 · 17 s · 1.0 |
-| `dbg-09-neg-scipy-minimize` | $0.13 · 17 s · 1.0 | $0.11 · 17 s · 1.0 | $0.04 · 14 s · 1.0 | $0.03 · 13 s · 1.0 | $0.02 · 16 s · 1.0 | $0.02 · 12 s · 1.0 |
-| **Fire cases, sum per run** | **$2.97** | **$1.98** | **$2.13** | **$1.29** | **$2.17** | **$1.76** |
-| **Whole suite, 3 runs per arm** | **$9.87** | **$6.61** | **$6.68** | **$4.09** | **$6.74** | **$5.37** |
+| `dbg-01-custom-adjoint-conv` | $0.43 · 44 s · 4.0 | $0.29 · 30 s · 2.0 | $0.32 · 99 s · 13.0 | $0.25 · 66 s · 8.3 | $0.23 · 42 s · 8.0 | $0.16 · 26 s · 2.7 |
+| `dbg-02-vstack-missing-conj` | $0.34 · 43 s · 4.0 | $0.26 · 33 s · 2.0 | $0.41 · 119 s · 9.7 | $0.20 · 67 s · 1.7 | $0.20 · 41 s · 7.3 | $0.24 · 32 s · 2.7 |
+| `dbg-03-complex-dtype-funcop` | $0.41 · 47 s · 6.0 | $0.29 · 40 s · 4.0 | $0.22 · 50 s · 8.0 | $0.29 · 34 s · 6.0 | $0.36 · 61 s · 10.0 | $0.22 · 29 s · 4.3 |
+| `dbg-04-scaling-stacked-blocks` | $0.44 · 57 s · 5.0 | $0.27 · 42 s · 2.3 | $0.30 · 102 s · 8.0 | $0.12 · 26 s · 1.0 | $0.18 · 53 s · 5.7 | $0.27 · 51 s · 3.3 |
+| `dbg-05-fista-eps-prose` | $0.37 · 41 s · 4.0 | $0.18 · 31 s · 1.0 | $0.45 · 104 s · 11.0 | $0.17 · 20 s · 1.0 | $0.31 · 41 s · 5.3 | $0.17 · 25 s · 1.0 |
+| `dbg-06-physics-limited` | $0.42 · 50 s · 4.7 | $0.29 · 38 s · 3.0 | $0.39 · 173 s · 14.3 | $0.26 · 47 s · 2.3 | $0.24 · 55 s · 6.3 | $0.19 · 39 s · 3.3 |
+| `dbg-07-two-bugs` | $0.35 · 46 s · 4.0 | $0.23 · 31 s · 2.0 | $0.31 · 114 s · 13.0 | $0.26 · 68 s · 6.3 | $0.28 · 55 s · 8.3 | $0.22 · 49 s · 3.3 |
+| `dbg-08-neg-which-solver` | $0.20 · 33 s · 4.0 | $0.12 · 23 s · 1.0 | $0.09 · 38 s · 6.0 | $0.06 · 16 s · 1.0 | $0.02 · 16 s · 3.3 | $0.05 · 14 s · 1.0 |
+| `dbg-09-neg-scipy-minimize` | $0.13 · 20 s · 1.0 | $0.11 · 20 s · 1.0 | $0.04 · 17 s · 1.0 | $0.04 · 16 s · 1.0 | $0.01 · 15 s · 1.0 | $0.02 · 14 s · 1.0 |
+| **Fire cases, sum per run** | **$2.76** | **$1.83** | **$2.39** | **$1.54** | **$1.80** | **$1.48** |
+| **Whole suite, 3 runs per arm** | **$9.27** | **$6.18** | **$7.56** | **$4.92** | **$5.51** | **$4.63** |
 
-- With the plugin a fire run costs about 50% more for Opus 5.5 and 65% more for
-  Haiku 4.5, mostly from loading the skill and the extra turns it asks for
-  (reproducing the problem, dot-tests, testing the fix).
-- For Opus 5.5 the extra cost buys a longer, more systematic report but not a
-  better diagnosis; for Haiku 4.5 it buys a few more correct diagnoses.
-- For Haiku 5.5 a fire run with the plugin costs about 25% more ($2.17 vs
-  $1.76), from the 8 runs that load the skill, and buys no better diagnosis.
-- Haiku 5.5 runs are much shorter than Haiku 4.5 runs (with the plugin 2–7
-  turns vs 8–15, and half the wall time) but cost about the same per run with
-  the plugin and more without it.
+- With the plugin a fire run costs about 50% more for Opus 5.5 and 55% more
+  for Haiku 4.5, and about 20% more for Haiku 5.5, mostly from loading the
+  skill and the extra turns it asks for (reproducing the problem, dot-tests,
+  testing the fix).
+- For Opus 5.5 the extra cost buys a check-by-check report but not a better
+  diagnosis; for Haiku 4.5 it buys more correct diagnoses; for Haiku 5.5 a few.
 
 ### Findings
 
-**Opus 5.5 does not need the skill.** Both arms get every fire case right
-(diagnosis 21/21, `no-fabrication` 21/21). Without the plugin Opus 5.5 runs the
-user's script once or twice and answers in 2–4 turns, including both bugs in
-`dbg-07` and "no bug, physics-limited" in `dbg-06`; with the plugin it does the
-same work as a check-by-check report in 4–6 turns. The only difference is
-`dbg-09`, where one answer with the plugin mentioned PyLops for a SciPy
-question.
+**The description says when to load the skill.** It asks to load it first,
+"before running the user's code, testing a hypothesis or answering, even when
+the bug looks obvious from the code". Haiku 5.5 otherwise ran the user's script
+or answered directly as soon as it saw the bug, and loaded the skill in only
+8/21 fire runs; with the current wording it loads it in 21/21, and the negative
+cases still never fire it.
 
-**Haiku 4.5 gets somewhat more diagnoses right with the skill, but the suite
-stays hard for it.** Correct diagnoses rise from 6/21 to 10/21 fire runs; the
-mean Δ is small (+0.04 on fire cases) because most cases fail the diagnosis in
-both arms and the gains are one run per case:
+**Opus 5.5 does not need the skill.** Both arms get every diagnosis right
+(21/21). Without the plugin Opus 5.5 runs the user's script once or twice and
+answers in 1–4 turns, including both bugs in `dbg-07` and "no bug,
+physics-limited" in `dbg-06`; with the plugin it does the same work as a
+check-by-check report in 4–6 turns. The two `no-fabrication` failures (one per
+arm) are discussed in Known limitations.
+
+**Haiku 4.5 gets more diagnoses right with the skill, but the suite stays hard
+for it.** Correct diagnoses rise from 6/21 to 13/21 fire runs:
 
 | Haiku 4.5, correct diagnosis | with | without |
-| ------------------------ | ---- | ------- |
+| ---------------------------- | ---- | ------- |
 | `dbg-01` wrong adjoint slice | 3/3 | 2/3 |
-| `dbg-02` missing conjugate | 1/3 | 0/3 |
+| `dbg-02` missing conjugate | 0/3 | 0/3 |
 | `dbg-03` missing complex dtype | 3/3 | 3/3 |
-| `dbg-04` block scaling | 1/3 | 1/3 |
-| `dbg-05` `eps` too large (prose) | 1/3 | 0/3 |
-| `dbg-06` physics-limited, no bug | 0/3 | 0/3 |
-| `dbg-07` two bugs | 1/3 | 0/3 |
+| `dbg-04` block scaling | 3/3 | 0/3 |
+| `dbg-05` `eps` too large (prose) | 0/3 | 0/3 |
+| `dbg-06` physics-limited, no bug | 1/3 | 0/3 |
+| `dbg-07` two bugs | 3/3 | 1/3 |
 
-- `no-fabrication` now fails only 2/21 Haiku 4.5 runs with the plugin. One is a
-  real overclaim: the `dbg-07` report gives a dot-test "ratio −8.5" where the
-  tool output shows 1.38 vs −0.998 (about −1.4).
-- `dbg-08`: in 1/3 runs with the plugin Haiku 4.5 asked clarifying questions
-  instead of recommending a solver and hit the 8-turn limit (influence of
-  `solve-inverse-problem`; `debug-inversion` was not called).
-- The arm without the plugin varies between runs (6/21 correct diagnoses here,
-  7/21–12/21 in earlier runs), so single-case Δs of one run (±0.13–0.17) are
-  within run-to-run variance.
+- The gains are on the cases where the skill's procedure adds a measurement:
+  the block norms in `dbg-04` (without the plugin Haiku 4.5 answers in one turn
+  and fails all three) and the second bug in `dbg-07`.
+- `dbg-05` fails in both arms: Haiku 4.5 compares `eps` with the data amplitude
+  instead of the critical value max|Opᴴy|, and with the plugin 2/3 reports
+  quote thresholds that the run does not support (`no-fabrication` 1/3).
+- `no-fabrication` fails 4/21 runs with the plugin (`dbg-01`, `dbg-05` twice,
+  `dbg-06`) and 2/21 without.
+- `dbg-08`: in 1/3 runs with the plugin Haiku 4.5 started writing a demo
+  script instead of recommending a solver and hit the 8-turn limit.
 
-**Haiku 5.5 does not need the skill.** It gets 19/21 diagnoses right without
-the plugin and 18/21 with it, close to Opus 5.5, including the cases Haiku 4.5
-never solved: "no bug, physics-limited" in `dbg-06`, both bugs in `dbg-07` and
-the `eps` far above the critical value in the prose-only `dbg-05`, 3/3 in each
-arm. Without the plugin it runs the user's script and answers in 1–5 turns.
+**Haiku 5.5 does not need the skill, but now always uses it.** It gets 18/21
+diagnoses right without the plugin and 20/21 with it, close to Opus 5.5,
+including the cases Haiku 4.5 does not solve (`dbg-05`, `dbg-06`):
 
-| Haiku 5.5, correct diagnosis | with | without | skill called |
-| ---------------------------- | ---- | ------- | ------------ |
-| `dbg-01` wrong adjoint slice | 3/3 | 3/3 | 0/3 |
-| `dbg-02` missing conjugate | 2/3 | 2/3 | 2/3 |
-| `dbg-03` missing complex dtype | 3/3 | 3/3 | 2/3 |
-| `dbg-04` block scaling | 1/3 | 2/3 | 1/3 |
-| `dbg-05` `eps` too large (prose) | 3/3 | 3/3 | 1/3 |
-| `dbg-06` physics-limited, no bug | 3/3 | 3/3 | 1/3 |
-| `dbg-07` two bugs | 3/3 | 3/3 | 1/3 |
+| Haiku 5.5, correct diagnosis | with | without |
+| ---------------------------- | ---- | ------- |
+| `dbg-01` wrong adjoint slice | 3/3 | 3/3 |
+| `dbg-02` missing conjugate | 3/3 | 2/3 |
+| `dbg-03` missing complex dtype | 3/3 | 3/3 |
+| `dbg-04` block scaling | 2/3 | 2/3 |
+| `dbg-05` `eps` too large (prose) | 3/3 | 3/3 |
+| `dbg-06` physics-limited, no bug | 3/3 | 2/3 |
+| `dbg-07` two bugs | 3/3 | 3/3 |
 
-- Haiku 5.5 loads `debug-inversion` in only 8/21 fire runs (Haiku 4.5: 21/21),
-  so most runs with the plugin behave like runs without it and the per-case Δs
-  (±0.07–0.17) are within run-to-run variance.
-- `dbg-04` is the only case that still fails on the diagnosis. The one run
-  that loaded the skill ranked the absolute `tol` of `cgls` (which stops it at
-  iteration 60) as the main cause and the block scaling second; the two other
-  failures found the imbalance but explained it mainly through `damp` or
-  hinted at a resolution limit (one of them on a split vote).
-- `dbg-02`: the two failed diagnoses give a correct fix,
-  `(y.conj() @ self.A).conj()`, and most likely fail the rubric's request for
-  a complex dot-test (`complexflag`), which they do not mention; these are
-  borderline grades.
-- `no-fabrication` fails once, without the plugin on `dbg-03`: the answer
-  reports an error of "0.13 → 1.32 at `1e-1`" where the tool output shows only
-  1.32.
-- The negative cases pass in every run in both arms.
+- The remaining failures are borderline grades (see Known limitations): two
+  `dbg-04` answers (one per arm) ranked the stopping test of `cgls` above the
+  block scaling, one `dbg-02` answer gave a correct fix without a complex
+  dot-test, and one `dbg-06` answer blamed the L2 prior without naming the
+  missing frequencies.
+- With the plugin its runs take 5–10 turns instead of 1–4 and cost about 20%
+  more.
 
 Parts of the skill that matter for Haiku 4.5 (each fixes a failure seen with an
 earlier version of the skill):
@@ -375,20 +371,34 @@ earlier version of the skill):
   the repository README. With an editable install, runs fail with
   `No module named 'pylops'` and cannot measure anything.
 - The trace passed to LLM judges is truncated for long runs ("…N messages
-  elided…"), and runs with the plugin are longer (Haiku 4.5: 8–15 turns vs 1–8,
-  Opus 5.5: 4–6 vs 1–4). `no-fabrication` therefore does not treat a value missing
-  from the visible trace as fabricated: it fails only a claim of running code
-  with no tool call at all, or a value presented as measured that contradicts
-  a visible tool result. Earlier, stricter wordings failed long runs whose
-  measured values sat in elided tool results (every such failure checked by
-  hand was a false positive) and correct one-turn answers that derived their
-  numbers from the prompt. The current check is weaker at catching invented
-  numbers inside elided sections.
+  elided…"), and runs with the plugin are longer (Haiku 4.5: 8–14 turns vs 1–8,
+  Haiku 5.5: 5–10 vs 1–4, Opus 5.5: 4–6 vs 1–4). `no-fabrication` therefore
+  does not treat a value missing from the visible trace as fabricated: it fails
+  only a claim of running code with no tool call at all, or a value presented
+  as measured that contradicts a visible tool result. Earlier, stricter
+  wordings failed long runs whose measured values sat in elided tool results
+  (every such failure checked by hand was a false positive) and correct
+  one-turn answers that derived their numbers from the prompt. The current
+  check is weaker at catching invented numbers inside elided sections.
+- `no-fabrication` still fails some runs whose visible trace shows no
+  contradicting value: Opus 5.5 on `dbg-04` with the plugin (split vote; the
+  unmatched values are ratios of measured ones) and Haiku 5.5 on `dbg-04`
+  without and `dbg-06` with the plugin (the values match the run's own notes
+  before an elided section). One Opus 5.5 failure is real: on `dbg-06` without
+  the plugin it states "the dot-test also passes" but never ran one.
+- `dbg-04` has a second, measurable explanation: `cgls` with its default
+  absolute `tol` stops with `istop=1` after ~60 iterations, and `tol=0` lowers
+  the model error without any weighting. Answers that rank this first and the
+  block scaling second fail criterion 5 of the rubric, which makes these grades
+  borderline.
+- `dbg-02` asks for a complex dot-test (`complexflag`) when one is cited, so a
+  correct fix with a plain dot-test can fail the diagnosis; its `fix-token`
+  regex also misses the equivalent fix `y @ self.A.conj()`.
 - The judges' reasoning is not stored in `aggregate-result.json` (only the
   votes); use `--keep-temp` to keep the traces for spot checks.
 - `dbg-08` grades the answer quality, which with the plugin installed can be
-  influenced by `solve-inverse-problem` (asking clarifying questions instead of
-  answering, which can hit the 8-turn limit).
-- The `fix-token` regex of `dbg-02` misses the equivalent fix
-  `y @ self.A.conj()`, which one Haiku 5.5 run with the plugin gave (its
-  diagnosis passed); this costs 0.2 on that run.
+  influenced by `solve-inverse-problem` (asking clarifying questions or writing
+  a demo instead of answering, which can hit the 8-turn limit).
+- Haiku 4.5 varies a lot between runs: repeating its run with the same skill
+  moves single cases by up to ±0.5 (e.g. the Δ of `dbg-04` and `dbg-05`), so
+  read its per-case Δs as indicative and its 21-run totals as the result.
