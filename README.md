@@ -190,9 +190,32 @@ The same commands work for the `pyproximal` plugin from `plugins/pyproximal`
 
 Findings from the runs (scores, uplift per model, known grader limitations) are
 recorded per skill in [`plugins/pylops/evals/README.md`](plugins/pylops/evals/README.md)
-and [`plugins/pyproximal/evals/README.md`](plugins/pyproximal/evals/README.md).
+and [`plugins/pyproximal/evals/README.md`](plugins/pyproximal/evals/README.md);
+generate their tables as described in [Table Generation](#table-generation).
 
 To add a new case, run `claude plugin eval init` from the plugin folder for a guided setup, or `claude plugin eval init --bare <name>` for a blank template, and follow the structure of the existing cases: put the case in `evals/<skill>/` and start its name with the skill's prefix.
+
+### Table Generation
+
+Generate the tables of the findings READMEs from the results rather than
+copying numbers by hand, with [`scripts/eval_tables.py`](scripts/eval_tables.py):
+
+```bash
+python scripts/eval_tables.py \
+  "Opus 5.5=plugins/pylops/evals/results/<timestamp>" \
+  "Haiku 5.5=plugins/pylops/evals/results/<timestamp>"
+```
+
+- Each argument is one run, `LABEL=FOLDER`: the label is the column name in
+  the tables (include the model version), the folder is the results folder that
+  `claude plugin eval` wrote for that run (its path is on the `Report:` line at
+  the end of the run). Quote each pair, since labels contain spaces.
+- Give one pair per model, in column order. All runs must be of the same suite.
+- The script only prints: the results table (with, without and Δ per case), the
+  cost table (cost, wall time and turns per run), and per model the skill
+  trigger rate, negative cases where the skill fired, and grader pass counts on
+  fire runs, also split by whether the skill was loaded. It also prints each
+  run's `--model` value, to check that labels and folders match.
 
 ## Contributing
 

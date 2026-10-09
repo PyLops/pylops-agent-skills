@@ -1,6 +1,6 @@
 ---
 name: solve-inverse-problem
-description: Set up and run the inversion of data with a PyLops operator in the user's project - choose the solver (lsqr, cgls, cg, regularized_inversion, preconditioned_inversion, fista, spgl1, omp, irls, splitbregman), the regularisation and the stopping parameters, and write a runnable script that reports convergence. Use when the user has (or can build) a PyLops operator and data and wants to invert it, e.g. "invert my data with this operator", "which PyLops solver should I use", "add Tikhonov / smoothness / sparsity regularisation to my inversion", "solve y = Op x".
+description: Use this skill whenever the user has (or can build) a PyLops operator and data and wants to invert it - load it before choosing a solver or writing any inversion code, even when the right solver or regularisation seems obvious. It sets up and runs the inversion in the user's project - choose the solver (lsqr, cgls, cg, regularized_inversion, preconditioned_inversion, fista, spgl1, omp, irls, splitbregman), the regularisation and the stopping parameters, and write a runnable script that reports convergence. E.g. "invert my data with this operator", "which PyLops solver should I use", "add Tikhonov / smoothness / sparsity regularisation to my inversion", "solve y = Op x". Not for an inversion that already misbehaves (use debug-inversion) or for choosing regularisation weights with an L-curve or sweep (use tune-regularization).
 ---
 
 Goal: a **runnable, reproducible inversion script** in the user's project that
