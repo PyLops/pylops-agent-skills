@@ -53,39 +53,42 @@ adjoint and its fix).
 
 ### Results
 
-All three models were run with 3 runs per arm on the current skill. The judge is
-Opus 5.5 for the Sonnet 5.5 run and Sonnet 5.5 for the Haiku runs, so it is
-never the agent model. `claude plugin eval` has no effort setting and runs each case with its
+All four models were run with 3 runs per arm on the current skill. The judge is
+Opus 5.5 for the Sonnet 5.5 run and Sonnet 5.5 for the Opus 5.5 and Haiku runs,
+so it is never the agent model. `claude plugin eval` has no effort setting and runs each case with its
 own configuration, so agent and judge ran at the models' default effort
 (chosen per turn), not at the user's `effortLevel`.
 
-| Case | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ |
-| ---- | --------------- | ------------------ | ------------ | -------------- | ----------------- | ----------- | -------------- | ----------------- | ----------- |
-| `sns-01-box-noisy-l2` | 0.86 | 0.90 | −0.05 | 1.00 | 0.67 | **+0.33** | 0.86 | 0.52 | **+0.33** |
-| `sns-02-group-sparsity` | 1.00 | 0.74 | **+0.26** | 0.69 | 0.36 | **+0.33** | 0.76 | 0.63 | +0.13 |
-| `sns-03-lowrank-completion` | 1.00 | 0.92 | +0.08 | 0.83 | 0.52 | **+0.31** | 1.00 | 0.45 | **+0.55** |
-| `sns-04-pnp-median` | 0.94 | 0.69 | **+0.25** | 0.81 | 0.24 | **+0.57** | 0.90 | 0.35 | **+0.56** |
-| `sns-05-neg-tikhonov` | 1.00 | 1.00 | 0.00 | 0.67 | 0.83 | −0.17 | 1.00 | 1.00 | 0.00 |
-| `sns-06-neg-dottest` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| **Mean (all cases)** | | | **+0.09** | | | **+0.23** | | | **+0.26** |
-| **Mean (fire cases `sns-01`–`sns-04`)** | | | **+0.14** | | | **+0.39** | | | **+0.39** |
+| Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sns-01-box-noisy-l2` | 0.98 | 0.96 | +0.01 | 0.86 | 0.90 | −0.05 | 1.00 | 0.67 | +0.33 | 0.86 | 0.52 | +0.33 |
+| `sns-02-group-sparsity` | 1.00 | 0.93 | +0.07 | 1.00 | 0.74 | +0.26 | 0.69 | 0.36 | +0.33 | 0.76 | 0.63 | +0.13 |
+| `sns-03-lowrank-completion` | 0.90 | 0.70 | +0.20 | 1.00 | 0.92 | +0.08 | 0.83 | 0.52 | +0.31 | 1.00 | 0.45 | +0.55 |
+| `sns-04-pnp-median` | 1.00 | 0.83 | +0.17 | 0.94 | 0.69 | +0.25 | 0.81 | 0.24 | +0.57 | 0.90 | 0.35 | +0.56 |
+| `sns-05-neg-tikhonov` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 0.67 | 0.83 | −0.17 | 1.00 | 1.00 | 0.00 |
+| `sns-06-neg-dottest` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **+0.08** | | | **+0.09** | | | **+0.23** | | | **+0.26** |
+| **Mean (fire cases `sns-01`–`sns-04`)** | | | **+0.11** | | | **+0.14** | | | **+0.39** | | | **+0.39** |
 
-| Fire runs | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
-| --------- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- |
-| skill called (`trigger`) | 12/12 | – | 12/12 | – | 10/12 | – |
-| right objective with a PyProximal solver (`objective-formulation`) | 12/12 | 10/12 | 9/12 | 1/12 | 10/12 | 0/12 |
-| step sizes from operator norms (`step-size-from-norm`) | 12/12 | 10/12 | 10/12 | 5/12 | 12/12 | 7/12 |
-| reports how the solver stopped (`convergence-reported`) | 12/12 | 2/12 | 10/12 | 3/12 | 10/12 | 0/12 |
-| no true model in `invert.py` (`no-truth-leak`) | 12/12 | 8/12 | 12/12 | 10/12 | 12/12 | 10/12 |
-| no tuning against the true model reported (`no-truth-leak-answer`) | 11/12 | 5/12 | 12/12 | 10/12 | 12/12 | 10/12 |
-| SNR above the threshold (`metric-threshold`) | 8/12 | 12/12 | 9/12 | 7/12 | 7/12 | 10/12 |
-| mean score | 0.95 | 0.81 | 0.83 | 0.45 | 0.88 | 0.49 |
+| Fire runs | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
+| --------- | ------------- | ---------------- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- |
+| skill called (`trigger`) | 12/12 | – | 12/12 | – | 12/12 | – | 10/12 | – |
+| right objective with a PyProximal solver (`objective-formulation`) | 11/12 | 9/12 | 12/12 | 10/12 | 9/12 | 1/12 | 10/12 | 0/12 |
+| step sizes from operator norms (`step-size-from-norm`) | 12/12 | 12/12 | 12/12 | 10/12 | 10/12 | 5/12 | 12/12 | 7/12 |
+| reports how the solver stopped (`convergence-reported`) | 12/12 | 5/12 | 12/12 | 2/12 | 10/12 | 3/12 | 10/12 | 0/12 |
+| no true model in `invert.py` (`no-truth-leak`) | 12/12 | 9/12 | 12/12 | 8/12 | 12/12 | 10/12 | 12/12 | 10/12 |
+| no tuning against the true model reported (`no-truth-leak-answer`) | 10/12 | 5/12 | 11/12 | 5/12 | 12/12 | 10/12 | 12/12 | 10/12 |
+| SNR above the threshold (`metric-threshold`) | 12/12 | 12/12 | 8/12 | 12/12 | 9/12 | 7/12 | 7/12 | 10/12 |
+| mean score | 0.97 | 0.86 | 0.95 | 0.81 | 0.83 | 0.45 | 0.88 | 0.49 |
 
-`solve-nonsmooth-problem` never fired on the negative cases (0/18 runs with the
-plugin across the three models).
+`solve-nonsmooth-problem` never fired on the negative cases (0/24 runs with the
+plugin across the four models).
 
 Reports:
 
+- Opus 5.5 (`--model claude-opus-5-5 --judge-model sonnet`, agent
+  `claude-opus-5-5`, judge Sonnet 5.5):
+  [report](results/2026-10-31T15-24-56-026Z/report.html).
 - Sonnet 5.5 (`--model claude-sonnet-5-5 --judge-model opus`, agent
   `claude-sonnet-5-5`, judge Opus 5.5):
   [report](results/2026-10-09T11-20-39-660Z/report.html).
@@ -99,30 +102,45 @@ Reports:
 ### Cost and effort
 
 Mean agent cost per run (USD, **excluding the judge**), mean wall time and mean
-turns, from the same runs. The Opus 5.5 judge adds about $0.18–0.36 per fire run
+turns, from the same runs. The Sonnet 5.5 judge adds about $0.06–0.23 per fire
+run and $0.01–0.03 per negative run for the Opus 5.5 agent run; the Opus 5.5 judge adds about $0.18–0.36 per fire run
 and $0.01–0.07 per negative run; the Sonnet 5.5 judge about $0.04–0.14 and
 $0.00–0.04.
 
-| Case | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
-| ---- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- |
-| `sns-01-box-noisy-l2` | $0.46 · 101 s · 6.0 | $0.37 · 156 s · 10.0 | $0.25 · 104 s · 17.0 | $0.12 · 64 s · 3.0 | $0.11 · 79 s · 10.0 | $0.06 · 69 s · 7.7 |
-| `sns-02-group-sparsity` | $0.38 · 66 s · 5.3 | $0.36 · 59 s · 3.7 | $0.34 · 193 s · 27.3 | $0.32 · 221 s · 25.0 | $0.11 · 85 s · 7.3 | $0.09 · 74 s · 8.3 |
-| `sns-03-lowrank-completion` | $0.38 · 71 s · 7.3 | $0.35 · 65 s · 5.0 | $0.28 · 192 s · 22.0 | $0.19 · 122 s · 12.3 | $0.07 · 121 s · 12.0 | $0.10 · 106 s · 12.7 |
-| `sns-04-pnp-median` | $0.41 · 60 s · 7.7 | $0.32 · 105 s · 7.3 | $0.24 · 119 s · 10.3 | $0.18 · 113 s · 7.0 | $0.09 · 104 s · 20.0 | $0.10 · 62 s · 9.7 |
-| `sns-05-neg-tikhonov` | $0.11 · 21 s · 2.0 | $0.12 · 26 s · 2.3 | $0.06 · 30 s · 1.3 | $0.05 · 28 s · 1.7 | $0.02 · 22 s · 3.3 | $0.02 · 21 s · 1.0 |
-| `sns-06-neg-dottest` | $0.07 · 15 s · 1.0 | $0.06 · 12 s · 1.0 | $0.06 · 34 s · 2.3 | $0.05 · 36 s · 1.0 | $0.01 · 16 s · 1.7 | $0.01 · 13 s · 1.0 |
-| **Fire cases, sum per run** | **$1.64** | **$1.40** | **$1.10** | **$0.81** | **$0.38** | **$0.35** |
-| **Whole suite, 3 runs per arm** | **$5.45** | **$4.75** | **$3.66** | **$2.74** | **$1.24** | **$1.17** |
+| Case | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sns-01-box-noisy-l2` | $0.59 · 169 s · 10.3 | $0.43 · 135 s · 8.7 | $0.46 · 101 s · 6.0 | $0.37 · 156 s · 10.0 | $0.25 · 104 s · 17.0 | $0.12 · 64 s · 3.0 | $0.11 · 79 s · 10.0 | $0.06 · 69 s · 7.7 |
+| `sns-02-group-sparsity` | $0.50 · 132 s · 8.3 | $0.37 · 90 s · 5.0 | $0.38 · 66 s · 5.3 | $0.36 · 59 s · 3.7 | $0.34 · 193 s · 27.3 | $0.32 · 221 s · 25.0 | $0.11 · 85 s · 7.3 | $0.09 · 74 s · 8.3 |
+| `sns-03-lowrank-completion` | $0.64 · 174 s · 15.0 | $0.40 · 126 s · 9.0 | $0.38 · 71 s · 7.3 | $0.35 · 65 s · 5.0 | $0.28 · 192 s · 22.0 | $0.19 · 122 s · 12.3 | $0.07 · 121 s · 12.0 | $0.10 · 106 s · 12.7 |
+| `sns-04-pnp-median` | $0.43 · 118 s · 8.7 | $0.37 · 125 s · 8.3 | $0.41 · 60 s · 7.7 | $0.32 · 105 s · 7.3 | $0.24 · 119 s · 10.3 | $0.18 · 113 s · 7.0 | $0.09 · 104 s · 20.0 | $0.10 · 62 s · 9.7 |
+| `sns-05-neg-tikhonov` | $0.18 · 39 s · 3.0 | $0.15 · 31 s · 2.3 | $0.11 · 21 s · 2.0 | $0.12 · 26 s · 2.3 | $0.06 · 30 s · 1.3 | $0.05 · 28 s · 1.7 | $0.02 · 22 s · 3.3 | $0.02 · 21 s · 1.0 |
+| `sns-06-neg-dottest` | $0.12 · 20 s · 1.7 | $0.11 · 18 s · 1.0 | $0.07 · 15 s · 1.0 | $0.06 · 12 s · 1.0 | $0.06 · 34 s · 2.3 | $0.05 · 36 s · 1.0 | $0.01 · 16 s · 1.7 | $0.01 · 13 s · 1.0 |
+| **Fire cases, sum per run** | **$2.15** | **$1.57** | **$1.64** | **$1.40** | **$1.10** | **$0.81** | **$0.38** | **$0.35** |
+| **Whole suite, all runs per arm** | **$7.33** | **$5.51** | **$5.45** | **$4.75** | **$3.66** | **$2.74** | **$1.24** | **$1.17** |
 
-- With the plugin a fire run costs about 17% more for Sonnet 5.5, 35% more for
+- With the plugin a fire run costs about 37% more for Opus 5.5, 17% more for Sonnet 5.5, 35% more for
   Haiku 4.5 (more checks, parameter selection and reporting) and about the same
   for Haiku 5.5.
-- Judge included, the Sonnet 5.5 suite cost about $16.90, the Haiku 4.5 suite
+- Judge included, the Opus 5.5 suite cost about $16.40, the Sonnet 5.5 suite about $16.90, the Haiku 4.5 suite
   about $8.50 and the Haiku 5.5 suite about $4.50. The top-level `costUsd` in
   each `aggregate-result.json` is the agent cost of both arms (judge excluded);
   per-run judge cost is stored as `judgeCostUsd`.
 
 ### Findings
+
+**Opus 5.5 is already strong without the plugin; the skill adds reporting and
+the right library.** It loads the skill in 12/12 fire runs and never on the
+negative cases. Fire-case mean 0.97 with the plugin vs 0.86 without (Δ +0.11).
+Without the plugin it already hits the SNR threshold (12/12) and derives step
+sizes from operator norms (12/12), so the Δ comes from the other graders:
+convergence reported in 12/12 vs 5/12 runs, a PyProximal objective in 11/12 vs
+9/12, and no tuning against the true model reported (`no-truth-leak-answer`)
+in 10/12 vs 5/12.
+
+- `sns-03` (+0.20) and `sns-04` (+0.17) show the largest uplift; the only
+  `objective-formulation` miss with the plugin is in `sns-03` (failed by all
+  three judge votes).
+- `sns-01` (+0.01) and `sns-02` (+0.07) are close to saturated in both arms.
 
 **The description says when to load the skill, and covers the cases where
 another tool would also work.** It asks to load the skill "before writing the
