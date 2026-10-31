@@ -46,36 +46,40 @@ grade the answer to the actual request. The judge is Sonnet 5.5
 
 ### Results
 
-All four models were run with 3 runs per arm and Sonnet 5.5 as the judge, on
+All five models were run with 3 runs per arm and Sonnet 5.5 as the judge, on
 the current skill.
 
-| Case                                    | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ | Gemma 4 31B with | Gemma 4 31B without | Gemma 4 31B Δ |
-| --------------------------------------- | ------------- | ---------------- | ---------- | -------------- | ----------------- | ----------- | -------------- | ----------------- | ----------- | ---------------- | ------------------- | ------------- |
-| `sip-01-blocky-blur`                    | 1.00          | 0.92             | +0.08      | 0.38           | 0.18              | +0.21       | 0.97           | 0.92              | +0.05       | 0.38             | 0.23                | +0.15         |
-| `sip-02-outlier-receivers`              | 1.00          | 1.00             | 0.00       | 0.79           | 0.92              | −0.13       | 0.95           | 0.85              | +0.10       | 0.74             | 0.77                | −0.03         |
-| `sip-03-tiny-scale-native`              | 1.00          | 0.92             | +0.08      | 0.46           | 0.44              | +0.03       | 0.97           | 0.87              | +0.10       | 0.44             | 0.74                | −0.31         |
-| `sip-04-cs-dct`                         | 1.00          | 0.87             | +0.13      | 1.00           | 0.23              | **+0.77**       | 0.87           | 0.90              | −0.03       | 0.74             | 0.64                | +0.10         |
-| `sip-05-neg-broken-inversion`           | 1.00          | 1.00             | 0.00       | 1.00           | 0.67              | +0.33       | 1.00           | 1.00              | 0.00        | 1.00             | 1.00                | 0.00          |
-| `sip-06-neg-tune-eps`                   | 1.00          | 1.00             | 0.00       | 0.50           | 0.67              | −0.17       | 1.00           | 1.00              | 0.00        | 1.00             | 1.00                | 0.00          |
-| **Mean (all cases)**                    |               |                  | **+0.05**  |                |                   | **+0.17**   |                |                   | **+0.04**   |                  |                     | **−0.01**     |
-| **Mean (fire cases `sip-01`–`sip-04`)** |               |                  | **+0.07**  |                |                   | **+0.22**   |                |                   | **+0.06**   |                  |                     | **−0.02**     |
+| Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ | Gemma 4 31B with | Gemma 4 31B without | Gemma 4 31B Δ |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sip-01-blocky-blur` | 1.00 | 0.92 | +0.08 | 0.82 | 0.85 | −0.03 | 0.38 | 0.18 | +0.21 | 0.97 | 0.92 | +0.05 | 0.38 | 0.23 | +0.15 |
+| `sip-02-outlier-receivers` | 1.00 | 1.00 | 0.00 | 0.97 | 0.85 | +0.13 | 0.79 | 0.92 | −0.13 | 0.95 | 0.85 | +0.10 | 0.74 | 0.77 | −0.03 |
+| `sip-03-tiny-scale-native` | 1.00 | 0.92 | +0.08 | 0.90 | 0.90 | 0.00 | 0.46 | 0.44 | +0.03 | 0.97 | 0.87 | +0.10 | 0.44 | 0.74 | −0.31 |
+| `sip-04-cs-dct` | 1.00 | 0.87 | +0.13 | 1.00 | 0.87 | +0.13 | 1.00 | 0.23 | +0.77 | 0.87 | 0.90 | −0.03 | 0.74 | 0.64 | +0.10 |
+| `sip-05-neg-broken-inversion` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 0.67 | +0.33 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| `sip-06-neg-tune-eps` | 1.00 | 1.00 | 0.00 | 0.83 | 0.67 | +0.17 | 0.50 | 0.67 | −0.17 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **+0.05** | | | **+0.07** | | | **+0.17** | | | **+0.04** | | | **−0.01** |
+| **Mean (fire cases `sip-01`–`sip-04`)** | | | **+0.07** | | | **+0.06** | | | **+0.22** | | | **+0.06** | | | **−0.02** |
 
-| Fire runs | Opus 5.5 with | Opus 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without | Gemma 4 31B with | Gemma 4 31B without |
-| --------- | ------------- | ---------------- | -------------- | ----------------- | -------------- | ----------------- | ---------------- | ------------------- |
-| skill called (`trigger`) | 12/12 | – | 6/12 | – | 8/12 | – | 0/12 | – |
-| right prior/solver (`prior-choice`) | 12/12 | 12/12 | 7/12 | 4/12 | 12/12 | 11/12 | 10/12 | 9/12 |
-| SNR above the threshold (`snr-threshold`) | 12/12 | 12/12 | 7/12 | 4/12 | 12/12 | 12/12 | 4/12 | 5/12 |
-| reports how the solver stopped (`iterations-or-cost`) | 12/12 | 4/12 | 7/12 | 3/12 | 7/12 | 4/12 | 0/12 | 1/12 |
-| reports the residual vs the noise level (`residual-vs-noise`) | 12/12 | 9/12 | 4/12 | 0/12 | 8/12 | 6/12 | 0/12 | 0/12 |
-| mean score | 1.00 | 0.93 | 0.66 | 0.44 | 0.94 | 0.89 | 0.58 | 0.60 |
+| Fire runs | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without | Gemma 4 31B with | Gemma 4 31B without |
+| --------- | ------------- | ---------------- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- | ---------------- | ------------------- |
+| skill called (`trigger`) | 12/12 | – | 12/12 | – | 6/12 | – | 8/12 | – | 0/12 | – |
+| right prior/solver (`prior-choice`) | 12/12 | 12/12 | 11/12 | 12/12 | 7/12 | 4/12 | 12/12 | 11/12 | 10/12 | 9/12 |
+| SNR above the threshold (`snr-threshold`) | 12/12 | 12/12 | 12/12 | 12/12 | 7/12 | 4/12 | 12/12 | 12/12 | 4/12 | 5/12 |
+| true model not used in the inversion (`no-truth-leak`) | 12/12 | 12/12 | 9/12 | 11/12 | 12/12 | 11/12 | 12/12 | 12/12 | 11/12 | 12/12 |
+| reports how the solver stopped (`iterations-or-cost`) | 12/12 | 4/12 | 10/12 | 1/12 | 7/12 | 3/12 | 7/12 | 4/12 | 0/12 | 1/12 |
+| reports the residual vs the noise level (`residual-vs-noise`) | 12/12 | 9/12 | 12/12 | 4/12 | 4/12 | 0/12 | 8/12 | 6/12 | 0/12 | 0/12 |
+| mean score | 1.00 | 0.93 | 0.92 | 0.87 | 0.66 | 0.44 | 0.94 | 0.89 | 0.58 | 0.60 |
 
-`solve-inverse-problem` never fired on the negative cases (0/24 runs with the
-plugin across the four models).
+`solve-inverse-problem` never fired on the negative cases (0/30 runs with the
+plugin across the five models).
 
 Reports:
 
 - Opus 5.5 (`--model claude-opus-5-5`, agent `claude-opus-5-5`):
   [report](results/2026-10-08T22-43-44-530Z/report.html).
+- Sonnet 5.5 (`--model claude-sonnet-5-5`, agent `claude-sonnet-5-5`; judge
+  pinned to `--judge-model claude-sonnet-5-5`):
+  [report](results/2026-10-31T15-07-36-564Z/report.html).
 - Haiku 4.5 (`--model claude-haiku-4-5-20251001`, agent `claude-haiku-4-5-20251001`):
   [report](results/2026-10-08T22-43-44-411Z/report.html).
 - Haiku 5.5 (`--model claude-haiku-5-5`, agent `claude-haiku-5-5`):
@@ -92,23 +96,25 @@ turns, from the same runs. The judge (Sonnet 5.5) adds about $0.02–0.11 per
 fire run, and up to ~$0.50–0.95 on `sip-06`, whose long traces are expensive
 to grade.
 
-| Case                              | Opus 5.5 with      | Opus 5.5 without    | Haiku 4.5 with       | Haiku 4.5 without    | Haiku 5.5 with      | Haiku 5.5 without   | Gemma 4 31B with    | Gemma 4 31B without |
-| --------------------------------- | ------------------ | ------------------- | -------------------- | -------------------- | ------------------- | ------------------- | ------------------- | ------------------- |
-| `sip-01-blocky-blur`              | $0.32 · 84 s · 8.3 | $0.26 · 75 s · 5.7  | $0.20 · 92 s · 11.3  | $0.18 · 102 s · 7.3  | $0.07 · 77 s · 11.3 | $0.06 · 64 s · 9.3  | $0.56 · 59 s · 32.7 | $0.37 · 44 s · 23.0 |
-| `sip-02-outlier-receivers`        | $0.28 · 49 s · 7.3 | $0.19 · 41 s · 3.3  | $0.18 · 101 s · 12.7 | $0.13 · 68 s · 3.3   | $0.07 · 53 s · 10.3 | $0.06 · 46 s · 9.3  | $0.25 · 29 s · 14.7 | $0.20 · 26 s · 9.7  |
-| `sip-03-tiny-scale-native`        | $0.33 · 77 s · 7.0 | $0.23 · 50 s · 4.7  | $0.29 · 182 s · 32.3 | $0.34 · 231 s · 35.3 | $0.08 · 72 s · 8.7  | $0.09 · 70 s · 11.7 | $0.51 · 60 s · 29.0 | $0.47 · 53 s · 29.3 |
-| `sip-04-cs-dct`                   | $0.27 · 53 s · 8.0 | $0.20 · 41 s · 3.7  | $0.17 · 117 s · 18.0 | $0.19 · 130 s · 18.3 | $0.07 · 39 s · 7.0  | $0.10 · 44 s · 6.0  | $0.33 · 42 s · 19.0 | $0.41 · 50 s · 24.7 |
-| `sip-05-neg-broken-inversion`     | $0.20 · 30 s · 4.3 | $0.13 · 23 s · 2.0  | $0.19 · 139 s · 13.3 | $0.07 · 54 s · 1.0   | $0.04 · 29 s · 4.7  | $0.03 · 25 s · 2.7  | $0.10 · 8 s · 2.0   | $0.10 · 10 s · 2.0  |
-| `sip-06-neg-tune-eps`             | $0.83 · 75 s · 9.0 | $0.94 · 78 s · 11.0 | $0.45 · 279 s · 13.3 | $0.43 · 60 s · 5.3   | $0.65 · 60 s · 12.3 | $0.13 · 36 s · 4.3  | $0.23 · 28 s · 5.7  | $0.27 · 22 s · 3.7  |
-| **Fire cases, sum per run**       | **$1.20**          | **$0.88**           | **$0.84**            | **$0.84**            | **$0.30**           | **$0.30**           | **$1.65**           | **$1.45**           |
-| **Whole suite, all runs per arm** | **$6.66**          | **$5.87**           | **$4.43**            | **$4.01**            | **$2.95**           | **$1.36**           | **$5.92**           | **$5.47**           |
+| Case | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without | Gemma 4 31B with | Gemma 4 31B without |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sip-01-blocky-blur` | $0.32 · 84 s · 8.3 | $0.26 · 75 s · 5.7 | $0.21 · 143 s · 7.0 | $0.17 · 94 s · 4.7 | $0.20 · 92 s · 11.3 | $0.18 · 102 s · 7.3 | $0.07 · 77 s · 11.3 | $0.06 · 64 s · 9.3 | $0.56 · 59 s · 32.7 | $0.37 · 44 s · 23.0 |
+| `sip-02-outlier-receivers` | $0.28 · 49 s · 7.3 | $0.19 · 41 s · 3.3 | $0.17 · 69 s · 5.0 | $0.14 · 72 s · 4.7 | $0.18 · 101 s · 12.7 | $0.13 · 68 s · 3.3 | $0.07 · 53 s · 10.3 | $0.06 · 46 s · 9.3 | $0.25 · 29 s · 14.7 | $0.20 · 26 s · 9.7 |
+| `sip-03-tiny-scale-native` | $0.33 · 77 s · 7.0 | $0.23 · 50 s · 4.7 | $0.19 · 76 s · 8.7 | $0.17 · 81 s · 5.3 | $0.29 · 182 s · 32.3 | $0.34 · 231 s · 35.3 | $0.08 · 72 s · 8.7 | $0.09 · 70 s · 11.7 | $0.51 · 60 s · 29.0 | $0.47 · 53 s · 29.3 |
+| `sip-04-cs-dct` | $0.27 · 53 s · 8.0 | $0.20 · 41 s · 3.7 | $0.21 · 73 s · 8.0 | $0.14 · 57 s · 4.0 | $0.17 · 117 s · 18.0 | $0.19 · 130 s · 18.3 | $0.07 · 39 s · 7.0 | $0.10 · 44 s · 6.0 | $0.33 · 42 s · 19.0 | $0.41 · 50 s · 24.7 |
+| `sip-05-neg-broken-inversion` | $0.20 · 30 s · 4.3 | $0.13 · 23 s · 2.0 | $0.11 · 34 s · 5.0 | $0.06 · 25 s · 1.0 | $0.19 · 139 s · 13.3 | $0.07 · 54 s · 1.0 | $0.04 · 29 s · 4.7 | $0.03 · 25 s · 2.7 | $0.10 · 8 s · 2.0 | $0.10 · 10 s · 2.0 |
+| `sip-06-neg-tune-eps` | $0.83 · 75 s · 9.0 | $0.94 · 78 s · 11.0 | $0.85 · 68 s · 9.3 | $0.63 · 51 s · 6.7 | $0.45 · 279 s · 13.3 | $0.43 · 60 s · 5.3 | $0.65 · 60 s · 12.3 | $0.13 · 36 s · 4.3 | $0.23 · 28 s · 5.7 | $0.27 · 22 s · 3.7 |
+| **Fire cases, sum per run** | **$1.20** | **$0.88** | **$0.78** | **$0.62** | **$0.84** | **$0.84** | **$0.30** | **$0.30** | **$1.65** | **$1.45** |
+| **Whole suite, all runs per arm** | **$6.66** | **$5.87** | **$5.21** | **$3.94** | **$4.43** | **$4.01** | **$2.95** | **$1.36** | **$5.92** | **$5.47** |
 
 - With the plugin a fire run costs about 35% more for Opus 5.5 ($1.20 vs
   $0.88), from loading the skill and the extra turns it asks for (checks,
   convergence report). For Haiku 4.5 and Haiku 5.5 both arms cost the same on
   fire cases.
 - Haiku 5.5 is about 3× cheaper than Haiku 4.5 on fire cases and 3–4×
-  cheaper than Opus 5.5, with runs of 6–12 turns.
+  cheaper than Opus 5.5, with runs of 6–12 turns. Sonnet 5.5 sits between
+  Opus 5.5 and Haiku 4.5 ($0.78 with, $0.62 without per fire run, 5–9 turns);
+  the plugin adds about 25% on fire cases.
 - The difference in the whole suite for Haiku 5.5 comes from `sip-06`, where
   `tune-regularization` fires in every run with the plugin.
 - The top-level `costUsd` in each `aggregate-result.json` is the agent cost of
@@ -132,6 +138,21 @@ the outliers, rescaled tiny data and `fista` in the DCT, with the right prior in
 12/12 runs and every fire run scores 1.00; the Δ of +0.07 on fire cases comes
 from reporting how the solver stopped (12/12 vs 4/12) and the residual vs the
 noise level (12/12 vs 9/12).
+
+**Sonnet 5.5 loads the skill every time and gains in reporting, but loses
+points on `no-truth-leak`.** It fires the skill in 12/12 fire runs and picks
+the right prior in 11/12 (12/12 without), with SNRs above the threshold in
+12/12 in both arms. As for Opus 5.5, the Δ of +0.06 on fire cases comes from
+reporting: the residual vs the noise level (12/12 vs 4/12) and how the solver
+stopped (10/12 vs 1/12). Against that, `sip-01` fails `no-truth-leak` in 3/3
+runs with the plugin (1/3 without; Δ −0.03): the script picks the TV weight
+`mu` by sweeping a grid and keeping the best SNR against the true model, and
+says in the answer that this is only legitimate on synthetic data and that
+`tune-regularization` should be used on real data. The skill does not tell it
+to avoid this. The other lost points are one `prior-choice` miss on `sip-03`
+(35 dB reached, but the judge did not accept the stated approach) and two runs that did not
+report how the solver stopped. The negative cases never fire the skill; the
+`sip-06` answer failed in 1/3 runs with the plugin and 2/3 without.
 
 **Haiku 4.5 benefits most when the skill fires, but it fires in only half the
 runs.** Runs that loaded the skill score 0.92 on average, runs with the plugin
