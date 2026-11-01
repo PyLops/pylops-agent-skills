@@ -457,8 +457,8 @@ Every fire case gives a working inversion with an untuned (or badly tuned) regul
 | `trg-03-fista-eps` | pasted code, noise 0.05 | `eps` of `fista` (5.0 gives an all-zero model) | scale from `max|Opᴴy|` ≈ 2, sweep downwards | `EPS_CHOSEN` 0.05–0.8 |
 | `trg-04-niter-cgls` | pasted code, noise 0.03 | `niter` of `cgls` (user's 1000) | semi-convergence: early stopping is the regulariser | `NITER_CHOSEN` 2–6 |
 | `trg-05-small-gcv` | pasted code, noise unknown | `damp` of `lsqr` (user's 0.001) | dense GCV (`Op.todense()` + SVD), compared with an L-curve | `DAMP_CHOSEN` 0.07–0.4 |
-| `trg-06-neg-build-inversion` | prose + pasted setup | none: no inversion written yet | `solve-inverse-problem` fires; `tune-regularization` must not | – |
-| `trg-07-l1-no-corner` | pasted code, noise 0.15 | `eps` of `fista`, user asks for the L-curve corner | the L-curve has shallow curvature and no single clear corner (a naive curvature maximum gives `eps` ≈ 1.2): say so and anchor on the discrepancy principle (≈ 0.66) | `EPS_CHOSEN` 0.25–1.0 |
+| `trg-06-l1-no-corner` | pasted code, noise 0.15 | `eps` of `fista`, user asks for the L-curve corner | the L-curve has shallow curvature and no single clear corner (a naive curvature maximum gives `eps` ≈ 1.2): say so and anchor on the discrepancy principle (≈ 0.66) | `EPS_CHOSEN` 0.25–1.0 |
+| `trg-07-neg-build-inversion` | prose + pasted setup | none: no inversion written yet | `solve-inverse-problem` fires; `tune-regularization` must not | – |
 
 Graders per fire case:
 
@@ -467,48 +467,49 @@ Graders per fire case:
 | `sweep-design` | LLM, trace | 1 | ≥ ~8 log-spaced values over ≥ 3 decades (a dense set of iteration counts for `trg-04`), residual and a second quantity recorded |
 | `criterion` | LLM, final answer | 1 | the case-specific reasoning and a value in the accepted range (discrepancy principle, `eps` scale, semi-convergence, GCV) |
 | `no-fabrication` | LLM, trace | 1 | reported numbers agree with tool output |
-| `multi-criterion` | LLM, final answer | 0.5 | at least two criteria, each with its picked value, and how they compare; `trg-01` and `trg-05` only |
+| `multi-criterion` | LLM, final answer | 0.5 | at least two criteria, each with its picked value, and how they compare; `trg-01`, `trg-05` and `trg-06` only |
 | `no-truth-leak` | LLM, `sweep.py` | 0.5 | the recommendation is not chosen by maximising SNR against the true model |
 | `final-value` | regex, trace | 0.5 | the printed last-line value lies in the accepted range |
 | `no-lsqr-warm-start` | LLM, `sweep.py` | 0.5 | `lsqr(damp=...)` solves are not warm-started from a previous solution (with `x0` the `damp` term penalises `‖x − x0‖`, which biases the sweep); `trg-02` only |
 | `script-exists` | `file_exists` | 0.25 | `sweep.py` was written |
 | `trigger` | `tool_used: Skill` | – | display only under ablation (not scored) |
 
-`trg-06` checks that `tune-regularization` is not called (`tool_used`, max 0) and grades that a PyLops inversion was actually built and run (`answer`). The `final-value` regexes accept both decimal and scientific notation (`0.237` and `2.371e-01`).
+`trg-07` checks that `tune-regularization` is not called (`tool_used`, max 0) and grades that a PyLops inversion was actually built and run (`answer`). The `final-value` regexes accept both decimal and scientific notation (`0.237` and `2.371e-01`).
 
 ### Results
 
-Three models, 3 runs per case and arm (with and without the plugin). The judge is Sonnet 5.5 for Opus 5.5 and Haiku 5.5, and Opus 5.5 for Sonnet 5.5 (the judge must differ from the agent). Tables generated with `scripts/eval_tables.py`.
+Three models, 3 runs per case and arm (with and without the plugin), all cases in one run per model. The judge is Sonnet 5.5 for Opus 5.5 and Haiku 5.5, and Opus 5.5 for Sonnet 5.5 (the judge must differ from the agent). Tables generated with `scripts/eval_tables.py`.
 
 | Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ |
 | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `trg-01-lcurve-epsrs` | 0.93 | 1.00 | −0.07 | 0.86 | 1.00 | −0.14 | 1.00 | 1.00 | 0.00 |
-| `trg-02-discrepancy-lsqr-damp` | 0.93 | 1.00 | −0.07 | 0.93 | 1.00 | −0.07 | 1.00 | 1.00 | 0.00 |
-| `trg-03-fista-eps` | 1.00 | 1.00 | 0.00 | 0.96 | 0.84 | +0.12 | 1.00 | 0.92 | +0.08 |
-| `trg-04-niter-cgls` | 1.00 | 1.00 | 0.00 | 0.96 | 0.88 | +0.08 | 0.84 | 1.00 | −0.16 |
-| `trg-05-small-gcv` | 1.00 | 1.00 | 0.00 | 0.93 | 0.89 | +0.04 | 1.00 | 1.00 | 0.00 |
-| `trg-06-neg-build-inversion` | 1.00 | 1.00 | 0.00 | 0.83 | 0.83 | 0.00 | 1.00 | 1.00 | 0.00 |
-| **Mean (all cases)** | | | **−0.02** | | | **0.00** | | | **−0.01** |
-| **Mean (fire cases `trg-01`–`trg-05`)** | | | **−0.03** | | | **0.00** | | | **−0.02** |
+| `trg-01-lcurve-epsrs` | 1.00 | 1.00 | 0.00 | 0.89 | 0.93 | −0.04 | 1.00 | 1.00 | 0.00 |
+| `trg-02-discrepancy-lsqr-damp` | 1.00 | 1.00 | 0.00 | 1.00 | 0.93 | +0.07 | 0.93 | 1.00 | −0.07 |
+| `trg-03-fista-eps` | 0.84 | 1.00 | −0.16 | 0.96 | 1.00 | −0.04 | 1.00 | 0.92 | +0.08 |
+| `trg-04-niter-cgls` | 1.00 | 0.92 | +0.08 | 0.88 | 1.00 | −0.12 | 1.00 | 0.96 | +0.04 |
+| `trg-05-small-gcv` | 0.86 | 0.86 | 0.00 | 0.89 | 0.93 | −0.04 | 0.86 | 1.00 | −0.14 |
+| `trg-06-l1-no-corner` | 0.93 | 0.86 | +0.07 | 0.75 | 0.65 | +0.11 | 0.93 | 0.89 | +0.04 |
+| `trg-07-neg-build-inversion` | 1.00 | 1.00 | 0.00 | 1.00 | 0.83 | +0.17 | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **0.00** | | | **+0.02** | | | **−0.01** |
+| **Mean (fire cases `trg-01`–`trg-06`)** | | | **0.00** | | | **−0.01** | | | **−0.01** |
 
-Mean score on fire cases: Opus 5.5 0.972 with, 1.000 without; Haiku 5.5 0.928 with, 0.924 without; Sonnet 5.5 0.969 with, 0.984 without. The skill was called in 15/15 fire runs for Opus 5.5 and Sonnet 5.5 and 11/15 for Haiku 5.5 (`trg-01` 3/3, `trg-02`–`trg-05` 2/3 each), and never fired on the negative case (0/3 runs of `trg-06` for all three).
+Mean score on fire cases: Opus 5.5 0.939 with, 0.940 without; Haiku 5.5 0.898 with, 0.906 without; Sonnet 5.5 0.953 with, 0.963 without. The skill was called in 18/18 fire runs for Opus 5.5 and Sonnet 5.5 and 15/18 for Haiku 5.5 (`trg-04` 1/3, `trg-05` 2/3, the others 3/3), and never fired on the negative case (0/3 runs of `trg-07` for all three).
 
 | Fire runs | Opus with | Opus without | Haiku with | Haiku with, skill loaded | Haiku without | Sonnet with | Sonnet without |
 | --------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `criterion` | 15/15 | 15/15 | 15/15 | 11/11 | 15/15 | 15/15 | 15/15 |
-| `final-value` | 15/15 | 15/15 | 15/15 | 11/11 | 15/15 | 15/15 | 15/15 |
-| `multi-criterion` | 6/6 | 6/6 | 6/6 | 5/5 | 5/6 | 6/6 | 6/6 |
-| `no-fabrication` | 13/15 | 15/15 | 11/15 | 7/11 | 13/15 | 14/15 | 14/15 |
-| `no-lsqr-warm-start` | 3/3 | 3/3 | 3/3 | 2/2 | 3/3 | 3/3 | 3/3 |
-| `no-truth-leak` | 15/15 | 15/15 | 13/15 | 9/11 | 14/15 | 13/15 | 15/15 |
-| `script-exists` | 15/15 | 15/15 | 15/15 | 11/11 | 15/15 | 15/15 | 15/15 |
-| `sweep-design` | 15/15 | 15/15 | 15/15 | 11/11 | 13/15 | 15/15 | 15/15 |
+| `criterion` | 18/18 | 18/18 | 18/18 | 15/15 | 15/18 | 18/18 | 17/18 |
+| `final-value` | 18/18 | 18/18 | 18/18 | 15/15 | 16/18 | 18/18 | 17/18 |
+| `multi-criterion` | 9/9 | 9/9 | 7/9 | 7/8 | 7/9 | 9/9 | 9/9 |
+| `no-fabrication` | 13/18 | 13/18 | 14/18 | 12/15 | 16/18 | 14/18 | 17/18 |
+| `no-lsqr-warm-start` | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 |
+| `no-truth-leak` | 18/18 | 18/18 | 15/18 | 13/15 | 18/18 | 18/18 | 17/18 |
+| `script-exists` | 18/18 | 18/18 | 18/18 | 15/15 | 18/18 | 18/18 | 18/18 |
+| `sweep-design` | 18/18 | 18/18 | 16/18 | 14/15 | 17/18 | 18/18 | 18/18 |
 
 Reports:
 
-- Opus 5.5, `--model claude-opus-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T19-34-51-892Z/report.html)
-- Haiku 5.5, `--model claude-haiku-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T19-18-31-812Z/report.html)
-- Sonnet 5.5, `--model claude-sonnet-5-5`, `--judge-model opus`: [report](results/2026-11-01T17-22-29-092Z/report.html)
+- Opus 5.5, `--model claude-opus-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T20-33-12-334Z/report.html)
+- Haiku 5.5, `--model claude-haiku-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T20-33-28-322Z/report.html)
+- Sonnet 5.5, `--model claude-sonnet-5-5`, `--judge-model opus`: [report](results/2026-11-01T20-33-20-391Z/report.html)
 
 ### Cost and effort
 
@@ -516,64 +517,35 @@ Cost · wall time · turns, mean per run (agent only, judge excluded).
 
 | Case | Opus 5.5 with | Opus 5.5 without | Haiku 5.5 with | Haiku 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without |
 | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `trg-01-lcurve-epsrs` | $2.57 · 100 s · 8.7 | $0.70 · 65 s · 3.3 | $1.94 · 79 s · 9.3 | $0.90 · 51 s · 3.3 | $2.41 · 86 s · 6.0 | $1.23 · 71 s · 3.7 |
-| `trg-02-discrepancy-lsqr-damp` | $1.78 · 80 s · 7.3 | $1.02 · 59 s · 3.3 | $0.91 · 71 s · 7.7 | $0.80 · 42 s · 3.7 | $1.91 · 82 s · 5.0 | $1.43 · 56 s · 2.3 |
-| `trg-03-fista-eps` | $1.64 · 88 s · 6.3 | $1.47 · 73 s · 4.3 | $0.95 · 62 s · 6.3 | $0.71 · 48 s · 4.0 | $1.85 · 80 s · 5.0 | $1.20 · 67 s · 3.3 |
-| `trg-04-niter-cgls` | $1.28 · 69 s · 7.0 | $0.92 · 58 s · 3.0 | $1.53 · 64 s · 7.7 | $0.53 · 146 s · 4.0 | $1.55 · 87 s · 8.7 | $1.21 · 48 s · 2.0 |
-| `trg-05-small-gcv` | $1.92 · 88 s · 8.3 | $0.79 · 58 s · 3.0 | $0.59 · 77 s · 7.0 | $0.57 · 51 s · 4.0 | $2.20 · 90 s · 6.0 | $1.02 · 61 s · 2.3 |
-| `trg-06-neg-build-inversion` | $0.84 · 89 s · 11.3 | $1.03 · 78 s · 7.3 | $0.42 · 72 s · 14.7 | $0.41 · 46 s · 8.7 | $0.44 · 44 s · 6.0 | $0.46 · 56 s · 5.3 |
-| **Fire cases, sum per run** | **$9.18** | **$4.89** | **$5.93** | **$3.51** | **$9.91** | **$6.10** |
-| **Whole suite, all runs per arm** | **$30.07** | **$17.75** | **$19.02** | **$11.75** | **$31.05** | **$19.67** |
+| `trg-01-lcurve-epsrs` | $1.85 · 102 s · 8.7 | $0.59 · 61 s · 3.3 | $1.64 · 94 s · 9.7 | $1.42 · 61 s · 3.7 | $2.34 · 89 s · 6.3 | $1.20 · 66 s · 4.7 |
+| `trg-02-discrepancy-lsqr-damp` | $1.49 · 83 s · 7.7 | $0.82 · 62 s · 3.3 | $0.92 · 63 s · 6.7 | $1.05 · 56 s · 3.3 | $1.77 · 76 s · 5.0 | $1.34 · 53 s · 2.7 |
+| `trg-03-fista-eps` | $1.42 · 91 s · 6.7 | $1.08 · 68 s · 4.3 | $0.93 · 72 s · 7.3 | $0.97 · 51 s · 4.0 | $1.49 · 75 s · 6.0 | $1.36 · 60 s · 2.0 |
+| `trg-04-niter-cgls` | $0.83 · 71 s · 6.0 | $0.60 · 51 s · 3.0 | $1.02 · 59 s · 5.0 | $0.55 · 42 s · 3.7 | $1.48 · 111 s · 6.0 | $0.82 · 46 s · 3.0 |
+| `trg-05-small-gcv` | $1.90 · 95 s · 7.0 | $1.18 · 60 s · 4.0 | $1.05 · 94 s · 10.3 | $0.58 · 59 s · 3.0 | $1.85 · 80 s · 5.0 | $1.29 · 56 s · 3.0 |
+| `trg-06-l1-no-corner` | $1.57 · 118 s · 10.0 | $1.50 · 98 s · 6.7 | $1.16 · 114 s · 13.3 | $0.84 · 66 s · 6.7 | $3.88 · 108 s · 7.7 | $2.08 · 88 s · 3.7 |
+| `trg-07-neg-build-inversion` | $0.80 · 67 s · 9.0 | $1.03 · 67 s · 5.7 | $0.37 · 78 s · 16.0 | $0.54 · 54 s · 10.0 | $0.51 · 47 s · 7.3 | $0.40 · 49 s · 6.3 |
+| **Fire cases, sum per run** | **$9.07** | **$5.77** | **$6.72** | **$5.40** | **$12.82** | **$8.08** |
+| **Whole suite, all runs per arm** | **$29.62** | **$20.40** | **$21.27** | **$17.84** | **$39.99** | **$25.46** |
 
-With the plugin, a fire run costs about 1.9× (Opus 5.5), 1.7× (Haiku 5.5) and 1.6× (Sonnet 5.5) as much and takes more turns. The judge adds $0.24–2.81 per fire run and $0.41–0.91 per negative run for Opus 5.5 (Sonnet judge), $0.24–2.39 and $0.12–0.61 for Haiku 5.5 (Sonnet judge), and $0.85–2.37 and $0.24–0.46 for Sonnet 5.5 (Opus judge). The whole suite cost $47.82 for the agent plus $39.30 for the judge (Opus 5.5), $30.77 plus $30.51 (Haiku 5.5), and $50.72 plus $47.40 (Sonnet 5.5).
-
-### Results for `trg-07`
-
-`trg-07` was added after the runs above and was run on its own, with the same models, judges and settings (3 runs per arm); it is therefore not part of the tables above. It is a fire case, so it is not counted in the negative-case sentence either. Tables generated with `scripts/eval_tables.py`.
-
-| Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ |
-| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `trg-07-l1-no-corner` | 0.93 | 0.93 | 0.00 | 0.86 | 0.65 | +0.21 | 1.00 | 0.75 | +0.25 |
-
-The skill was called in 3/3 with-plugin runs for each model.
-
-| Runs | Opus with | Opus without | Haiku with | Haiku without | Sonnet with | Sonnet without |
-| ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `criterion` | 3/3 | 3/3 | 2/3 | 0/3 | 3/3 | 2/3 |
-| `final-value` | 3/3 | 3/3 | 3/3 | 1/3 | 3/3 | 2/3 |
-| `multi-criterion` | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 |
-| `no-fabrication` | 2/3 | 2/3 | 3/3 | 2/3 | 3/3 | 1/3 |
-| `no-truth-leak` | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 |
-| `script-exists` | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 |
-| `sweep-design` | 3/3 | 3/3 | 2/3 | 3/3 | 3/3 | 3/3 |
-
-Cost · wall time · turns, mean per run (agent only, judge excluded).
-
-| Case | Opus 5.5 with | Opus 5.5 without | Haiku 5.5 with | Haiku 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without |
-| ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `trg-07-l1-no-corner` | $1.88 · 142 s · 11.0 | $0.82 · 129 s · 7.3 | $0.94 · 100 s · 11.0 | $0.70 · 80 s · 7.3 | $2.65 · 98 s · 7.3 | $1.65 · 74 s · 5.0 |
-
-Reports:
-
-- Opus 5.5, `--model claude-opus-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T20-21-22-206Z/report.html)
-- Haiku 5.5, `--model claude-haiku-5-5`, `--judge-model sonnet`: [report](results/2026-11-01T20-16-07-797Z/report.html)
-- Sonnet 5.5, `--model claude-sonnet-5-5`, `--judge-model opus`: [report](results/2026-11-01T20-21-08-171Z/report.html)
+With the plugin, a fire run costs about 1.6× (Opus 5.5), 1.2× (Haiku 5.5) and 1.6× (Sonnet 5.5) as much and takes more turns. The judge adds $0.25–1.97 per fire run and $0.45–1.14 per negative run for Opus 5.5 (Sonnet judge), $0.37–2.33 and $0.12–0.98 for Haiku 5.5 (Sonnet judge), and $0.55–4.07 and $0.26–0.45 for Sonnet 5.5 (Opus judge). The whole suite cost $50.02 for the agent plus $39.94 for the judge (Opus 5.5), $39.11 plus $38.75 (Haiku 5.5), and $65.45 plus $61.42 (Sonnet 5.5).
 
 ### Findings
 
-Across the three models the plugin gives no measurable uplift on this suite: mean Δ on fire cases is −0.03 (Opus 5.5), 0.00 (Haiku 5.5) and −0.02 (Sonnet 5.5), and `criterion` and `final-value` are 15/15 in both arms for every model. The no-plugin agents already choose a sound criterion and a value in range, so the cases cannot separate the arms.
+Across the three models the plugin gives no measurable uplift in the score on this suite: the mean Δ on fire cases is 0.00 (Opus 5.5), −0.01 (Haiku 5.5) and −0.01 (Sonnet 5.5). Most cases are saturated, because the agents without the plugin already choose a sound criterion and a value in range: `criterion` and `final-value` are 18/18 without it for Opus 5.5, and 17/18 for Sonnet 5.5. The score differences are mostly single judge failures on `no-fabrication`, which fails in 5 of 18 runs per arm for Opus 5.5, in 4 with and 1 without the plugin for Sonnet 5.5, and in 4 with and 2 without for Haiku 5.5; I did not read the answers behind them.
 
-**`trg-07` (L1 problem without a clear L-curve corner).** This is the one case where the arms separate for two of the three models. With the plugin, all runs of Sonnet 5.5 and Haiku 5.5 recommended an `eps` in range (Sonnet 0.51–0.56, Haiku 0.51–0.66) and `final-value` is 3/3 for both. Without it, one Sonnet 5.5 run and two Haiku 5.5 runs took the naive corner (`eps` 1.1–1.2, outside the range), so `final-value` is 2/3 and 1/3, and `criterion` (admitting the corner is ambiguous and anchoring on another criterion) is 2/3 and 0/3 for Sonnet 5.5 and Haiku 5.5 without the plugin. Opus 5.5 recommends about 0.63, the discrepancy value, in all six runs, so it shows no difference (0.93 in both arms, one `no-fabrication` failure each). The Sonnet 5.5 without-plugin arm also lost `no-fabrication` in two runs, and the Haiku 5.5 with-plugin arm lost `criterion` in one run and `sweep-design` in another; I did not read the answers behind those judge failures. With 3 runs per arm and a single run set per model, these are indicative.
+The one case where the plugin changes the recommendation is `trg-06-l1-no-corner` (an L1 problem whose L-curve has no clear corner; a naive curvature maximum gives `eps` ≈ 1.2, the discrepancy value is ≈ 0.66, accepted range 0.25–1.0). Taking each run's last printed `EPS_CHOSEN`, all three Haiku 5.5 runs and one Sonnet 5.5 run without the plugin recommended the naive corner (1.12–1.28), while none of the six runs with the plugin did (0.50–0.66); Opus 5.5 recommended the discrepancy value (0.53–0.64) in all six runs with and without the plugin. In `criterion` (admitting the corner is ambiguous and anchoring on another criterion) this shows as 3/18 failures for Haiku 5.5 without the plugin, all in `trg-06`, against none with it.
 
-**Opus 5.5.** Without the plugin every grader passes in all 15 fire runs (1.000); with it two runs lose `no-fabrication` (`trg-01` and `trg-02`, one run each), giving 0.972 and a Δ of −0.03. The skill was called in 15/15 fire runs and never on the negative case, which scores 1.00 in both arms. I did not read the two failed `no-fabrication` answers.
+**Opus 5.5.** The score is 0.939 with and 0.940 without. Every grader except `no-fabrication` passes in all 36 fire runs; `no-fabrication` fails in 5 runs per arm, which I did not read. The skill was called in 18/18 fire runs and never on the negative case.
 
-**Haiku 5.5.** The plugin makes no net difference on this suite (mean Δ 0.00; fire cases 0.928 with, 0.924 without). Correctness is saturated, as for Sonnet 5.5: `criterion` and `final-value` are 15/15 in both arms. The skill was loaded in 11/15 fire runs (not in one run each of `trg-02`–`trg-05`) and never on the negative case. Runs where it was loaded scored lower (0.902, 11 runs) than runs where it was not (1.000, 4 runs), driven by `no-fabrication` (7/11 against 4/4); with the plugin `no-fabrication` failed in 4 runs (`trg-01` twice, `trg-02`, `trg-05`) against 2 without. Without the plugin, `sweep-design` failed in 2 runs (`trg-03`, `trg-05`) against none with it. `trg-06` scores 0.83 in both arms because one run per arm failed the `answer` grader; I did not read those answers. Per-case Δs range from −0.14 (`trg-01`) to +0.12 (`trg-03`) and come from single-grader differences in a few runs, so I read them as noise rather than a plugin effect.
+**Sonnet 5.5.** 0.953 with, 0.963 without. The skill was called in 18/18 fire runs. Without the plugin, one `trg-06` run recommended the naive corner (1.277), failing `criterion` and `final-value`. With the plugin it also has more `no-fabrication` failures (4 against 1), which I did not read.
 
-**Sonnet 5.5.** On this suite the plugin does not improve the score: Sonnet 5.5 without it already gets every `final-value` and `criterion` right on all five fire cases (15/15), so the cases do not separate the arms (mean Δ −0.01). The skill is reliably chosen (15/15 on fire cases, 0/3 on the negative case). The differences are in single graders: with the plugin, `no-truth-leak` failed in 2 of the 3 `trg-04` runs, and one `trg-04` run failed `no-fabrication` (its final answer recommends `niter=3` while its script printed `NITER_CHOSEN=2`); without the plugin one `trg-03` run failed `no-fabrication`. In `trg-04` run 1 the recommendation of 3 iterations is the best-SNR iterate against `xtrue`; I did not read the script of the other `no-truth-leak` failure. Both arms land every `trg-01`–`trg-05` recommendation inside the accepted range (`final-value` 15/15 with and without). The suite needs harder cases, or a weaker model, to show uplift.
+**Haiku 5.5.** 0.898 with, 0.906 without. The skill was loaded in 15/18 fire runs (not in two `trg-04` runs and one `trg-05` run); the 15 runs with the skill loaded scored 0.922, the 3 without 0.777. Without the plugin, `criterion` fails in 3 runs and `final-value` in 2, all in `trg-06`. With the plugin, `no-truth-leak` fails in 3 runs (0 without) and `sweep-design` in 2; I did not read these. `trg-07` scores 1.00 with and 0.83 without; the gap is one without-plugin run failing the `answer` grader, which I did not read.
 
-**Warm start of `lsqr(damp=...)`.** An earlier run of this suite (before `SKILL.md` step 3 was changed) found a skill problem: it advised warm starting every sweep, and all three with-plugin `trg-02` runs warm-started `lsqr(damp=...)`, picked `damp` 0.59–0.69 instead of about 0.3, and scored 0.65 against 1.00 without the plugin. With `x0`, PyLops and SciPy `lsqr` penalise `damp² ‖x − x0‖²` (checked against the closed-form minimiser: 4e-12 away, against 1.06 for `‖x‖²`), so a warm-started sweep is biased. `cgls(damp=...)` and `epsRs` in `regularized_inversion` are not affected (checked numerically). The skill now says so, `trg-02` has a `no-lsqr-warm-start` grader, and the run reported above scores 1.00 with the plugin.
+**Warm start of `lsqr(damp=...)`.** An earlier run of this suite (before `SKILL.md` step 3 was changed) found a skill problem: it advised warm starting every sweep, and all three with-plugin `trg-02` runs warm-started `lsqr(damp=...)`, picked `damp` 0.59–0.69 instead of about 0.3, and scored 0.65 against 1.00 without the plugin. With `x0`, PyLops and SciPy `lsqr` penalise `damp² ‖x − x0‖²` (checked against the closed-form minimiser: 4e-12 away, against 1.06 for `‖x‖²`), so a warm-started sweep is biased. `cgls(damp=...)` and `epsRs` in `regularized_inversion` are not affected (checked numerically). The skill now says so and `trg-02` has a `no-lsqr-warm-start` grader: in the runs reported above it passes in 3/3 with-plugin runs for each model, and all nine with-plugin `trg-02` recommendations are in range.
 
 ### Known limitations of the graders
 
 - `no-truth-leak` and `no-fabrication` are judged from partial traces and `sweep.py`; two failed judgements were not inspected beyond the answer text.
 - The accepted ranges were calibrated on one seed per problem.
+- `final-value` searches the whole trace for an in-range `EPS_CHOSEN=`/`DAMP_CHOSEN=`/`NITER_CHOSEN=` line, so a run that printed an in-range value earlier and recommends another one later can still pass. The findings above use each run's last printed value.
+- The score differences between arms are small and dominated by judge-graded `no-fabrication`/`no-truth-leak` failures on 3 runs per arm and one run set per model; read them as indicative.
