@@ -110,8 +110,8 @@ The `pylops` plugin currently has evals for:
 
 | Cases | What they test |
 | ----- | -------------- |
-| `trg-01`–`trg-05` | Choosing a regularisation knob for a working inversion: `epsRs` by L-curve and discrepancy (`regularized_inversion`), `damp` of `lsqr` by the discrepancy principle, the scale of `eps` in `fista`, `niter` of `cgls` as implicit regularisation, and `damp` by GCV on a small dense problem with unknown noise: graded on the sweep design, the criterion used, the value reached, not using the true model to pick it, and on not reporting values that no command in the run produced |
-| `trg-06` | Negative case (build an inversion from scratch): `solve-inverse-problem` should fire and `tune-regularization` should *not* |
+| `trg-01`–`trg-06` | Choosing a regularisation knob for a working inversion: `epsRs` by L-curve and discrepancy (`regularized_inversion`), `damp` of `lsqr` by the discrepancy principle, the scale of `eps` in `fista`, `niter` of `cgls` as implicit regularisation, `damp` by GCV on a small dense problem with unknown noise, and an L1 problem whose L-curve has no clear corner: graded on the sweep design, the criterion used, the value reached, not using the true model to pick it, and on not reporting values that no command in the run produced |
+| `trg-07` | Negative case (build an inversion from scratch): `solve-inverse-problem` should fire and `tune-regularization` should *not* |
 
 The `pyproximal` plugin currently has evals for:
 
