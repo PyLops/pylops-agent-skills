@@ -90,6 +90,7 @@ The `pylops` plugin currently has evals for:
 | ----- | ------ | ------ |
 | `solve-inverse-problem` | `evals/solve-inverse-problem/` | `sip-` |
 | `debug-inversion` | `evals/debug-inversion/` | `dbg-` |
+| `tune-regularization` | `evals/tune-regularization/` | `trg-` |
 
 `solve-inverse-problem` cases (each asks for a script `invert.py` that is run and prints `SNR_DB=<value>` for the inverted model):
 
@@ -104,6 +105,13 @@ The `pylops` plugin currently has evals for:
 | ----- | -------------- |
 | `dbg-01`–`dbg-07` | A wrong adjoint (off-by-one slice, missing conjugate, forward instead of reverse cumsum), a missing complex `dtype`, badly scaled stacked blocks, an `eps` far too large for `fista`, a result limited by the physics rather than a bug, and a case with two independent bugs: graded on the diagnosis and fix, and on not reporting values that no command in the run produced |
 | `dbg-08`–`dbg-09` | Negative cases (choosing a solver for a new problem, a SciPy optimisation question): the skill should *not* trigger |
+
+`tune-regularization` cases (each asks for a script `sweep.py` that is run and prints the recommended value, e.g. `EPS_CHOSEN=<value>`):
+
+| Cases | What they test |
+| ----- | -------------- |
+| `trg-01`–`trg-05` | Choosing a regularisation knob for a working inversion: `epsRs` by L-curve and discrepancy (`regularized_inversion`), `damp` of `lsqr` by the discrepancy principle, the scale of `eps` in `fista`, `niter` of `cgls` as implicit regularisation, and `damp` by GCV on a small dense problem with unknown noise: graded on the sweep design, the criterion used, the value reached, not using the true model to pick it, and on not reporting values that no command in the run produced |
+| `trg-06` | Negative case (build an inversion from scratch): `solve-inverse-problem` should fire and `tune-regularization` should *not* |
 
 The `pyproximal` plugin currently has evals for:
 
