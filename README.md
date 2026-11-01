@@ -197,7 +197,7 @@ To plot those tables as one bar chart per skill (mean score per model, with and
 without the plugin, in decreasing order), run `python scripts/eval_plot.py`: it
 reads the committed READMEs and writes a self-contained `web/index.html`.
 Model logos are picked up from `asset/<family>.(svg|png)` (e.g. `opus.svg`,
-`haiku.svg`, `gemma.svg`); a coloured initial is drawn when one is missing.
+`haiku.svg`); a coloured initial is drawn when one is missing.
 
 To add a new case, run `claude plugin eval init` from the plugin folder for a guided setup, or `claude plugin eval init --bare <name>` for a blank template, and follow the structure of the existing cases: put the case in `evals/<skill>/` and start its name with the skill's prefix.
 
