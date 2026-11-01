@@ -9,8 +9,7 @@ each bar and the model logo sits inside its top; below it, the model name and
 With/Without.
 
 Model logos are read from `asset/` (or `asset/models/`) as <family>.(svg|png|jpg|webp), with
-<family> the first word of the model label in lower case (`Opus 5.5` -> `opus`,
-`Gemma 4 31B` -> `gemma`); a coloured initial is drawn when a file is missing.
+<family> the first word of the model label in lower case (`Opus 5.5` -> `opus`); a coloured initial is drawn when a file is missing.
 Images are embedded in the HTML, which needs no network.
 
     python scripts/eval_plot.py                      # all plugins/*/evals/README.md

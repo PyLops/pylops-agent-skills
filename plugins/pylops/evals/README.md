@@ -46,32 +46,32 @@ grade the answer to the actual request. The judge is Sonnet 5.5
 
 ### Results
 
-All five models were run with 3 runs per arm and Sonnet 5.5 as the judge, on
+All four models were run with 3 runs per arm and Sonnet 5.5 as the judge, on
 the current skill.
 
-| Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ | Gemma 4 31B with | Gemma 4 31B without | Gemma 4 31B Δ |
-| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `sip-01-blocky-blur` | 1.00 | 0.92 | +0.08 | 0.82 | 0.85 | −0.03 | 0.38 | 0.18 | +0.21 | 0.97 | 0.92 | +0.05 | 0.38 | 0.23 | +0.15 |
-| `sip-02-outlier-receivers` | 1.00 | 1.00 | 0.00 | 0.97 | 0.85 | +0.13 | 0.79 | 0.92 | −0.13 | 0.95 | 0.85 | +0.10 | 0.74 | 0.77 | −0.03 |
-| `sip-03-tiny-scale-native` | 1.00 | 0.92 | +0.08 | 0.90 | 0.90 | 0.00 | 0.46 | 0.44 | +0.03 | 0.97 | 0.87 | +0.10 | 0.44 | 0.74 | −0.31 |
-| `sip-04-cs-dct` | 1.00 | 0.87 | +0.13 | 1.00 | 0.87 | +0.13 | 1.00 | 0.23 | +0.77 | 0.87 | 0.90 | −0.03 | 0.74 | 0.64 | +0.10 |
-| `sip-05-neg-broken-inversion` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 0.67 | +0.33 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| `sip-06-neg-tune-eps` | 1.00 | 1.00 | 0.00 | 0.83 | 0.67 | +0.17 | 0.50 | 0.67 | −0.17 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 |
-| **Mean (all cases)** | | | **+0.05** | | | **+0.07** | | | **+0.17** | | | **+0.04** | | | **−0.01** |
-| **Mean (fire cases `sip-01`–`sip-04`)** | | | **+0.07** | | | **+0.06** | | | **+0.22** | | | **+0.06** | | | **−0.02** |
+| Case | Opus 5.5 with | Opus 5.5 without | Opus 5.5 Δ | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ | Haiku 4.5 with | Haiku 4.5 without | Haiku 4.5 Δ | Haiku 5.5 with | Haiku 5.5 without | Haiku 5.5 Δ |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sip-01-blocky-blur` | 1.00 | 0.92 | +0.08 | 0.82 | 0.85 | −0.03 | 0.38 | 0.18 | +0.21 | 0.97 | 0.92 | +0.05 |
+| `sip-02-outlier-receivers` | 1.00 | 1.00 | 0.00 | 0.97 | 0.85 | +0.13 | 0.79 | 0.92 | −0.13 | 0.95 | 0.85 | +0.10 |
+| `sip-03-tiny-scale-native` | 1.00 | 0.92 | +0.08 | 0.90 | 0.90 | 0.00 | 0.46 | 0.44 | +0.03 | 0.97 | 0.87 | +0.10 |
+| `sip-04-cs-dct` | 1.00 | 0.87 | +0.13 | 1.00 | 0.87 | +0.13 | 1.00 | 0.23 | +0.77 | 0.87 | 0.90 | −0.03 |
+| `sip-05-neg-broken-inversion` | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.00 | 1.00 | 0.67 | +0.33 | 1.00 | 1.00 | 0.00 |
+| `sip-06-neg-tune-eps` | 1.00 | 1.00 | 0.00 | 0.83 | 0.67 | +0.17 | 0.50 | 0.67 | −0.17 | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **+0.05** | | | **+0.07** | | | **+0.17** | | | **+0.04** |
+| **Mean (fire cases `sip-01`–`sip-04`)** | | | **+0.07** | | | **+0.06** | | | **+0.22** | | | **+0.06** |
 
-| Fire runs | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without | Gemma 4 31B with | Gemma 4 31B without |
-| --------- | ------------- | ---------------- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- | ---------------- | ------------------- |
-| skill called (`trigger`) | 12/12 | – | 12/12 | – | 6/12 | – | 8/12 | – | 0/12 | – |
-| right prior/solver (`prior-choice`) | 12/12 | 12/12 | 11/12 | 12/12 | 7/12 | 4/12 | 12/12 | 11/12 | 10/12 | 9/12 |
-| SNR above the threshold (`snr-threshold`) | 12/12 | 12/12 | 12/12 | 12/12 | 7/12 | 4/12 | 12/12 | 12/12 | 4/12 | 5/12 |
-| true model not used in the inversion (`no-truth-leak`) | 12/12 | 12/12 | 9/12 | 11/12 | 12/12 | 11/12 | 12/12 | 12/12 | 11/12 | 12/12 |
-| reports how the solver stopped (`iterations-or-cost`) | 12/12 | 4/12 | 10/12 | 1/12 | 7/12 | 3/12 | 7/12 | 4/12 | 0/12 | 1/12 |
-| reports the residual vs the noise level (`residual-vs-noise`) | 12/12 | 9/12 | 12/12 | 4/12 | 4/12 | 0/12 | 8/12 | 6/12 | 0/12 | 0/12 |
-| mean score | 1.00 | 0.93 | 0.92 | 0.87 | 0.66 | 0.44 | 0.94 | 0.89 | 0.58 | 0.60 |
+| Fire runs | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
+| --------- | ------------- | ---------------- | --------------- | ------------------ | -------------- | ----------------- | -------------- | ----------------- |
+| skill called (`trigger`) | 12/12 | – | 12/12 | – | 6/12 | – | 8/12 | – |
+| right prior/solver (`prior-choice`) | 12/12 | 12/12 | 11/12 | 12/12 | 7/12 | 4/12 | 12/12 | 11/12 |
+| SNR above the threshold (`snr-threshold`) | 12/12 | 12/12 | 12/12 | 12/12 | 7/12 | 4/12 | 12/12 | 12/12 |
+| true model not used in the inversion (`no-truth-leak`) | 12/12 | 12/12 | 9/12 | 11/12 | 12/12 | 11/12 | 12/12 | 12/12 |
+| reports how the solver stopped (`iterations-or-cost`) | 12/12 | 4/12 | 10/12 | 1/12 | 7/12 | 3/12 | 7/12 | 4/12 |
+| reports the residual vs the noise level (`residual-vs-noise`) | 12/12 | 9/12 | 12/12 | 4/12 | 4/12 | 0/12 | 8/12 | 6/12 |
+| mean score | 1.00 | 0.93 | 0.92 | 0.87 | 0.66 | 0.44 | 0.94 | 0.89 |
 
-`solve-inverse-problem` never fired on the negative cases (0/30 runs with the
-plugin across the five models).
+`solve-inverse-problem` never fired on the negative cases (0/24 runs with the
+plugin across the four models).
 
 Reports:
 
@@ -84,10 +84,6 @@ Reports:
   [report](results/2026-10-08T22-43-44-411Z/report.html).
 - Haiku 5.5 (`--model claude-haiku-5-5`, agent `claude-haiku-5-5`):
   [report](results/2026-10-08T22-31-43-603Z/report.html).
-- Gemma 4 31B (`--model gemma4:31b-cloud`, agent `gemma4:31b-cloud`):
-  [report](results/2026-10-31T13-51-54-909Z/report.html). One run (`sip-03`,
-  with the plugin) ended with `unrecognized_model` from Claude Code and hit the
-  40-turn limit; the other 35 runs completed.
 
 ### Cost and effort
 
@@ -96,16 +92,16 @@ turns, from the same runs. The judge (Sonnet 5.5) adds about $0.02–0.11 per
 fire run, and up to ~$0.50–0.95 on `sip-06`, whose long traces are expensive
 to grade.
 
-| Case | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without | Gemma 4 31B with | Gemma 4 31B without |
-| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| `sip-01-blocky-blur` | $0.32 · 84 s · 8.3 | $0.26 · 75 s · 5.7 | $0.21 · 143 s · 7.0 | $0.17 · 94 s · 4.7 | $0.20 · 92 s · 11.3 | $0.18 · 102 s · 7.3 | $0.07 · 77 s · 11.3 | $0.06 · 64 s · 9.3 | $0.56 · 59 s · 32.7 | $0.37 · 44 s · 23.0 |
-| `sip-02-outlier-receivers` | $0.28 · 49 s · 7.3 | $0.19 · 41 s · 3.3 | $0.17 · 69 s · 5.0 | $0.14 · 72 s · 4.7 | $0.18 · 101 s · 12.7 | $0.13 · 68 s · 3.3 | $0.07 · 53 s · 10.3 | $0.06 · 46 s · 9.3 | $0.25 · 29 s · 14.7 | $0.20 · 26 s · 9.7 |
-| `sip-03-tiny-scale-native` | $0.33 · 77 s · 7.0 | $0.23 · 50 s · 4.7 | $0.19 · 76 s · 8.7 | $0.17 · 81 s · 5.3 | $0.29 · 182 s · 32.3 | $0.34 · 231 s · 35.3 | $0.08 · 72 s · 8.7 | $0.09 · 70 s · 11.7 | $0.51 · 60 s · 29.0 | $0.47 · 53 s · 29.3 |
-| `sip-04-cs-dct` | $0.27 · 53 s · 8.0 | $0.20 · 41 s · 3.7 | $0.21 · 73 s · 8.0 | $0.14 · 57 s · 4.0 | $0.17 · 117 s · 18.0 | $0.19 · 130 s · 18.3 | $0.07 · 39 s · 7.0 | $0.10 · 44 s · 6.0 | $0.33 · 42 s · 19.0 | $0.41 · 50 s · 24.7 |
-| `sip-05-neg-broken-inversion` | $0.20 · 30 s · 4.3 | $0.13 · 23 s · 2.0 | $0.11 · 34 s · 5.0 | $0.06 · 25 s · 1.0 | $0.19 · 139 s · 13.3 | $0.07 · 54 s · 1.0 | $0.04 · 29 s · 4.7 | $0.03 · 25 s · 2.7 | $0.10 · 8 s · 2.0 | $0.10 · 10 s · 2.0 |
-| `sip-06-neg-tune-eps` | $0.83 · 75 s · 9.0 | $0.94 · 78 s · 11.0 | $0.85 · 68 s · 9.3 | $0.63 · 51 s · 6.7 | $0.45 · 279 s · 13.3 | $0.43 · 60 s · 5.3 | $0.65 · 60 s · 12.3 | $0.13 · 36 s · 4.3 | $0.23 · 28 s · 5.7 | $0.27 · 22 s · 3.7 |
-| **Fire cases, sum per run** | **$1.20** | **$0.88** | **$0.78** | **$0.62** | **$0.84** | **$0.84** | **$0.30** | **$0.30** | **$1.65** | **$1.45** |
-| **Whole suite, all runs per arm** | **$6.66** | **$5.87** | **$5.21** | **$3.94** | **$4.43** | **$4.01** | **$2.95** | **$1.36** | **$5.92** | **$5.47** |
+| Case | Opus 5.5 with | Opus 5.5 without | Sonnet 5.5 with | Sonnet 5.5 without | Haiku 4.5 with | Haiku 4.5 without | Haiku 5.5 with | Haiku 5.5 without |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| `sip-01-blocky-blur` | $0.32 · 84 s · 8.3 | $0.26 · 75 s · 5.7 | $0.21 · 143 s · 7.0 | $0.17 · 94 s · 4.7 | $0.20 · 92 s · 11.3 | $0.18 · 102 s · 7.3 | $0.07 · 77 s · 11.3 | $0.06 · 64 s · 9.3 |
+| `sip-02-outlier-receivers` | $0.28 · 49 s · 7.3 | $0.19 · 41 s · 3.3 | $0.17 · 69 s · 5.0 | $0.14 · 72 s · 4.7 | $0.18 · 101 s · 12.7 | $0.13 · 68 s · 3.3 | $0.07 · 53 s · 10.3 | $0.06 · 46 s · 9.3 |
+| `sip-03-tiny-scale-native` | $0.33 · 77 s · 7.0 | $0.23 · 50 s · 4.7 | $0.19 · 76 s · 8.7 | $0.17 · 81 s · 5.3 | $0.29 · 182 s · 32.3 | $0.34 · 231 s · 35.3 | $0.08 · 72 s · 8.7 | $0.09 · 70 s · 11.7 |
+| `sip-04-cs-dct` | $0.27 · 53 s · 8.0 | $0.20 · 41 s · 3.7 | $0.21 · 73 s · 8.0 | $0.14 · 57 s · 4.0 | $0.17 · 117 s · 18.0 | $0.19 · 130 s · 18.3 | $0.07 · 39 s · 7.0 | $0.10 · 44 s · 6.0 |
+| `sip-05-neg-broken-inversion` | $0.20 · 30 s · 4.3 | $0.13 · 23 s · 2.0 | $0.11 · 34 s · 5.0 | $0.06 · 25 s · 1.0 | $0.19 · 139 s · 13.3 | $0.07 · 54 s · 1.0 | $0.04 · 29 s · 4.7 | $0.03 · 25 s · 2.7 |
+| `sip-06-neg-tune-eps` | $0.83 · 75 s · 9.0 | $0.94 · 78 s · 11.0 | $0.85 · 68 s · 9.3 | $0.63 · 51 s · 6.7 | $0.45 · 279 s · 13.3 | $0.43 · 60 s · 5.3 | $0.65 · 60 s · 12.3 | $0.13 · 36 s · 4.3 |
+| **Fire cases, sum per run** | **$1.20** | **$0.88** | **$0.78** | **$0.62** | **$0.84** | **$0.84** | **$0.30** | **$0.30** |
+| **Whole suite, all runs per arm** | **$6.66** | **$5.87** | **$5.21** | **$3.94** | **$4.43** | **$4.01** | **$2.95** | **$1.36** |
 
 - With the plugin a fire run costs about 35% more for Opus 5.5 ($1.20 vs
   $0.88), from loading the skill and the extra turns it asks for (checks,
@@ -193,19 +189,6 @@ plugin; the gain is in reporting how the solver stopped (6/8 loaded runs vs
   interpolation, so the description does not compete for it.
 - On `sip-03`, one run without the plugin failed `prior-choice` while reaching
   33.7 dB.
-
-**Gemma 4 31B does not use the skill.** It loaded it in 0 of 12 fire runs, so
-the plugin has no effect: the mean fire score is 0.58 with the plugin and 0.60
-without (Δ −0.02, within run-to-run noise). It picks a reasonable prior in
-10/12 runs with the plugin (9/12 without), but rarely reaches the SNR
-threshold (4/12 vs 5/12) and never reports the residual vs the noise level
-(0/12 in both arms), the part of the workflow that the skill adds for the
-other models. On the negative cases it does not fire the skill either (0/6)
-and scores 1.00. A fire run costs more than for any Claude model in this table
-($1.65 with, $1.45 without) because it needs 15–33 turns per run (Opus 5.5:
-4–8). Whether this is a model limitation or a tool-calling problem with this
-model through Claude Code (note the `unrecognized_model` error) is not
-established.
 
 ### Known limitations of the graders
 
