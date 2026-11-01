@@ -22,7 +22,7 @@ Map the user's solver to the knob being tuned and its meaning:
 
 | Solver | Parameter | Objective term |
 |---|---|---|
-| `cgls` / `lsqr` | `damp` | `damp² ‖x‖²` |
+| `cgls` / `lsqr` | `damp` | `damp² ‖x‖²` (for `lsqr` only with `x0=None`, see step 3) |
 | `regularized_inversion` | `epsRs=[ε₁, ε₂, …]` | `Σ εᵢ² ‖Rᵢ x‖²` |
 | `normal_equations_inversion` | `epsI`, `epsRs` (and `epsNRs`) | `epsI² ‖x‖²`, `Σ εᵢ² ‖Rᵢ x‖²` (same scaling as `regularized_inversion`) |
 | `ista` / `fista` | `eps` | `eps ‖SOpᴴ x‖₁` (effective threshold is `eps·alpha/2`) |
@@ -65,7 +65,13 @@ Adapt `reference/lcurve_template.py`:
   `eps₀ ≈ max|Opᴴ y|` scale for L1 thresholds, where larger values give all-zero
   models);
 - solve from large to small ε and **warm start** from the previous solution
-  (`x0=...`) to save iterations - unless the solver ignores `x0`;
+  (`x0=...`) to save iterations - unless the solver ignores `x0`. **Exception:
+  `damp` of `lsqr`** (PyLops and SciPy): with `x0` it solves for the correction
+  `x - x0`, so it penalises `damp² ‖x - x0‖²`, not `damp² ‖x‖²`, and a
+  warm-started sweep is biased (residual too low, discrepancy pick too large).
+  Use `x0=None` for every `lsqr(damp=...)` solve, or put the penalty in the
+  operator (`VStack([Op, eps*Reg])`, `regularized_inversion`), where `x0` is
+  safe. `cgls(damp=...)` and `epsRs` are not affected (checked numerically);
 - keep `niter` large enough that each solve has converged, otherwise the curve
   measures iteration count, not regularisation (check a couple of cost curves);
 - for early stopping as regulariser, run once with a callback that stores

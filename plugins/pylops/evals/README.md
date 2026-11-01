@@ -443,3 +443,92 @@ earlier version of the skill):
 - Haiku 4.5 varies a lot between runs: repeating its run with the same skill
   moves single cases by up to ±0.5 (e.g. the Δ of `dbg-04` and `dbg-05`), so
   read its per-case Δs as indicative and its 21-run totals as the result.
+
+## `tune-regularization` (`trg-*`)
+
+### What the suite tests
+
+Every fire case gives a working inversion with an untuned (or badly tuned) regularisation knob and asks for a script `sweep.py` that is run and prints the recommended value as its last line. Acceptance ranges for the printed value were calibrated by running each problem over a sweep of the knob (discrepancy and best-SNR values bracket the range).
+
+| Case | Input | Knob | Right approach | Accepted value |
+| ---- | ----- | ---- | -------------- | -------------- |
+| `trg-01-lcurve-epsrs` | pasted code, noise 0.05 | `epsRs` of `regularized_inversion` (user's 0.5 is far too small) | log sweep, L-curve corner and discrepancy principle, both reported | `EPS_CHOSEN` 3–40 |
+| `trg-02-discrepancy-lsqr-damp` | pasted code, known noise 0.1 | `damp` of `lsqr` (user's 0.01) | discrepancy principle, residual ≈ σ√N | `DAMP_CHOSEN` 0.12–0.45 |
+| `trg-03-fista-eps` | pasted code, noise 0.05 | `eps` of `fista` (5.0 gives an all-zero model) | scale from `max|Opᴴy|` ≈ 2, sweep downwards | `EPS_CHOSEN` 0.05–0.8 |
+| `trg-04-niter-cgls` | pasted code, noise 0.03 | `niter` of `cgls` (user's 1000) | semi-convergence: early stopping is the regulariser | `NITER_CHOSEN` 2–6 |
+| `trg-05-small-gcv` | pasted code, noise unknown | `damp` of `lsqr` (user's 0.001) | dense GCV (`Op.todense()` + SVD), compared with an L-curve | `DAMP_CHOSEN` 0.07–0.4 |
+| `trg-06-neg-build-inversion` | prose + pasted setup | none: no inversion written yet | `solve-inverse-problem` fires; `tune-regularization` must not | – |
+
+Graders per fire case:
+
+| Grader | Type | Weight | Checks |
+| ------ | ---- | ------ | ------ |
+| `sweep-design` | LLM, trace | 1 | ≥ ~8 log-spaced values over ≥ 3 decades (a dense set of iteration counts for `trg-04`), residual and a second quantity recorded |
+| `criterion` | LLM, final answer | 1 | the case-specific reasoning and a value in the accepted range (discrepancy principle, `eps` scale, semi-convergence, GCV) |
+| `no-fabrication` | LLM, trace | 1 | reported numbers agree with tool output |
+| `multi-criterion` | LLM, final answer | 0.5 | at least two criteria, each with its picked value, and how they compare; `trg-01` and `trg-05` only |
+| `no-truth-leak` | LLM, `sweep.py` | 0.5 | the recommendation is not chosen by maximising SNR against the true model |
+| `final-value` | regex, trace | 0.5 | the printed last-line value lies in the accepted range |
+| `no-lsqr-warm-start` | LLM, `sweep.py` | 0.5 | `lsqr(damp=...)` solves are not warm-started from a previous solution (with `x0` the `damp` term penalises `‖x − x0‖`, which biases the sweep); `trg-02` only |
+| `script-exists` | `file_exists` | 0.25 | `sweep.py` was written |
+| `trigger` | `tool_used: Skill` | – | display only under ablation (not scored) |
+
+`trg-06` checks that `tune-regularization` is not called (`tool_used`, max 0) and grades that a PyLops inversion was actually built and run (`answer`). The `final-value` regexes accept both decimal and scientific notation (`0.237` and `2.371e-01`).
+
+### Results
+
+One model, 3 runs per case and arm (with and without the plugin), judge Opus 5.5 (the judge must differ from the agent). Tables generated with `scripts/eval_tables.py`.
+
+| Case | Sonnet 5.5 with | Sonnet 5.5 without | Sonnet 5.5 Δ |
+| ---- | ---- | ---- | ---- |
+| `trg-01-lcurve-epsrs` | 1.00 | 1.00 | 0.00 |
+| `trg-02-discrepancy-lsqr-damp` | 1.00 | 1.00 | 0.00 |
+| `trg-03-fista-eps` | 1.00 | 0.92 | +0.08 |
+| `trg-04-niter-cgls` | 0.84 | 1.00 | −0.16 |
+| `trg-05-small-gcv` | 1.00 | 1.00 | 0.00 |
+| `trg-06-neg-build-inversion` | 1.00 | 1.00 | 0.00 |
+| **Mean (all cases)** | | | **−0.01** |
+| **Mean (fire cases `trg-01`–`trg-05`)** | | | **−0.02** |
+
+Mean score on fire cases: 0.969 with, 0.984 without. The skill was called in 15/15 fire runs and never fired on the negative case (0/3 runs of `trg-06`).
+
+| Fire runs | with | without |
+| --------- | ---- | ------- |
+| `criterion` | 15/15 | 15/15 |
+| `final-value` | 15/15 | 15/15 |
+| `multi-criterion` | 6/6 | 6/6 |
+| `no-fabrication` | 14/15 | 14/15 |
+| `no-lsqr-warm-start` | 3/3 | 3/3 |
+| `no-truth-leak` | 13/15 | 15/15 |
+| `script-exists` | 15/15 | 15/15 |
+| `sweep-design` | 15/15 | 15/15 |
+
+Report (Sonnet 5.5, `--model claude-sonnet-5-5`, `--judge-model opus`): [report](results/2026-11-01T17-22-29-092Z/report.html).
+
+### Cost and effort
+
+Cost · wall time · turns, mean per run (agent only, judge excluded).
+
+| Case | Sonnet 5.5 with | Sonnet 5.5 without |
+| ---- | ---- | ---- |
+| `trg-01-lcurve-epsrs` | $2.41 · 86 s · 6.0 | $1.23 · 71 s · 3.7 |
+| `trg-02-discrepancy-lsqr-damp` | $1.91 · 82 s · 5.0 | $1.43 · 56 s · 2.3 |
+| `trg-03-fista-eps` | $1.85 · 80 s · 5.0 | $1.20 · 67 s · 3.3 |
+| `trg-04-niter-cgls` | $1.55 · 87 s · 8.7 | $1.21 · 48 s · 2.0 |
+| `trg-05-small-gcv` | $2.20 · 90 s · 6.0 | $1.02 · 61 s · 2.3 |
+| `trg-06-neg-build-inversion` | $0.44 · 44 s · 6.0 | $0.46 · 56 s · 5.3 |
+| **Fire cases, sum per run** | **$9.91** | **$6.10** |
+| **Whole suite, all runs per arm** | **$31.05** | **$19.67** |
+
+With the plugin, a fire run costs about 1.6× as much and takes more turns. The judge adds $0.85–2.37 per fire run and $0.24–0.46 per negative run. The whole suite cost $50.72 for the agent plus $47.40 for the judge.
+
+### Findings
+
+**Sonnet 5.5.** On this suite the plugin does not improve the score: Sonnet 5.5 without it already gets every `final-value` and `criterion` right on all five fire cases (15/15), so the cases do not separate the arms (mean Δ −0.01). The skill is reliably chosen (15/15 on fire cases, 0/3 on the negative case). The differences are in single graders: with the plugin, `no-truth-leak` failed in 2 of the 3 `trg-04` runs, and one `trg-04` run failed `no-fabrication` (its final answer recommends `niter=3` while its script printed `NITER_CHOSEN=2`); without the plugin one `trg-03` run failed `no-fabrication`. In `trg-04` run 1 the recommendation of 3 iterations is the best-SNR iterate against `xtrue`; I did not read the script of the other `no-truth-leak` failure. Both arms land every `trg-01`–`trg-05` recommendation inside the accepted range (`final-value` 15/15 with and without). The suite needs harder cases, or a weaker model, to show uplift.
+
+**Warm start of `lsqr(damp=...)`.** An earlier run of this suite (before `SKILL.md` step 3 was changed) found a skill problem: it advised warm starting every sweep, and all three with-plugin `trg-02` runs warm-started `lsqr(damp=...)`, picked `damp` 0.59–0.69 instead of about 0.3, and scored 0.65 against 1.00 without the plugin. With `x0`, PyLops and SciPy `lsqr` penalise `damp² ‖x − x0‖²` (checked against the closed-form minimiser: 4e-12 away, against 1.06 for `‖x‖²`), so a warm-started sweep is biased. `cgls(damp=...)` and `epsRs` in `regularized_inversion` are not affected (checked numerically). The skill now says so, `trg-02` has a `no-lsqr-warm-start` grader, and the run reported above scores 1.00 with the plugin.
+
+### Known limitations of the graders
+
+- `no-truth-leak` and `no-fabrication` are judged from partial traces and `sweep.py`; two failed judgements were not inspected beyond the answer text.
+- The accepted ranges were calibrated on one seed per problem.
